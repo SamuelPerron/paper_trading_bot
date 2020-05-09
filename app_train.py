@@ -17,7 +17,7 @@ class TrainingBot:
     def get_portfolio(self):
         return Portfolio(
             capital=1000.00,
-            profit_per=0.0101,
+            profit_per=0.0102,
             loss_per=0.01,
             position_size=0.11,
             withdraw_money=True
@@ -32,7 +32,14 @@ class TrainingBot:
                 self.make_action(symbol, date)
                 self.portfolio.refresh_market_value(date)
             self.portfolio.snapshot(date)
-        print(f'Final portfolio:\nCapital: {round(self.portfolio.capital, 2)}$\nPositions value: {round(self.portfolio.market_value, 2)}$\nPositions: {self.portfolio.positions}\nTotal amount: {round(self.portfolio.capital + self.portfolio.market_value + self.portfolio.withdrawed_capital, 2)}$')
+        print(f'''
+            Final portfolio:
+            Capital: {round(self.portfolio.capital, 2)}$
+            Positions value: {round(self.portfolio.market_value, 2)}$
+            Total amount: {round(self.portfolio.capital + self.portfolio.market_value + self.portfolio.withdrawed_capital, 2)}$
+            Total trades: {self.portfolio.total_trades}
+            Overall win %: {round(self.portfolio.wins * 100 / self.portfolio.total_trades, 2)}%
+        ''')
         self.plot_results()
 
     def delete_old_data(self):
@@ -43,7 +50,6 @@ class TrainingBot:
         # Buy
         self.portfolio.check_for_buy(data, date)
         # Sell
-        # if not buy:
         self.portfolio.check_for_sale(data, date)
 
     def plot_results(self):
