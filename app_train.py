@@ -17,7 +17,7 @@ class TrainingBot:
     def get_portfolio(self):
         return Portfolio(
             capital=1000.00,
-            profit_per=0.0102,
+            profit_per=0.0101,
             loss_per=0.01,
             position_size=0.11,
             withdraw_money=True
@@ -39,6 +39,8 @@ class TrainingBot:
             Total amount: {round(self.portfolio.capital + self.portfolio.market_value + self.portfolio.withdrawed_capital, 2)}$
             Total trades: {self.portfolio.total_trades}
             Overall win %: {round(self.portfolio.wins * 100 / self.portfolio.total_trades, 2)}%
+            Best trade: {round(self.portfolio.best_trade)}$
+            Worst trade: -{round(self.portfolio.worst_trade)}$
         ''')
         self.plot_results()
 

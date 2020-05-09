@@ -15,6 +15,8 @@ class Portfolio:
         self.withdraw_money = withdraw_money
         self.total_trades = 0
         self.wins = 0
+        self.best_trade = 0
+        self.worst_trade = 0
         print('New portfolio with 1000$ of base capital')
 
     def snapshot(self, date):
@@ -43,6 +45,10 @@ class Portfolio:
         new_positions = [position for position in self.positions if position['symbol'] != symbol]
         self.positions = new_positions
         self.capital += new_value
+        if self.best_trade < new_value:
+            self.best_trade = new_value
+        if self.worst_trade > new_value:
+            self.worst_trade = new_value
         self.total_trades += 1
         self.refresh_market_value(date)
 
@@ -90,7 +96,9 @@ class Portfolio:
 
     def check_for_buy(self, data, date):
         if data is not None:
-            if data['50d_avg'] > data['200d_avg'] and (data['50d_avg'] > 0 and data['200d_avg'] > 0):
+            if (data['50d_avg'] > 0 and data['200d_avg'] > 0) and\
+                data['50d_avg'] > data['200d_avg'] and\
+                data['rsi'] < 70:
                 max_price = self.position_size * self.capital
                 nb_actions = int(round((max_price / float(data['close'])), 0))
                 self.add_position(
