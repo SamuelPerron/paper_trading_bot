@@ -16,7 +16,9 @@ class Portfolio:
         self.total_trades = 0
         self.wins = 0
         self.best_trade = 0
-        self.worst_trade = 0
+        self.worst_trade = 99999
+        self.peak = 0
+        self.low = 99999
         print('New portfolio with 1000$ of base capital')
 
     def snapshot(self, date):
@@ -40,6 +42,11 @@ class Portfolio:
             self.capital = self.base_capital
             self.withdrawed_capital += diff
         self.total_value = self.market_value + self.capital + self.withdrawed_capital
+        if self.total_value > self.peak:
+            self.peak = self.total_value
+        if self.total_value < self.low:
+            self.low = self.total_value
+
 
     def remove_position(self, symbol, new_value, date):
         new_positions = [position for position in self.positions if position['symbol'] != symbol]
@@ -66,7 +73,7 @@ class Portfolio:
             market_value = float(data['close']) * info_positions['total_nb']
             # Profit
             if info_positions['total_nb'] > 0 and \
-                market_value > info_positions['total_value'] + (info_positions['total_value'] * self.profit_per):
+                (market_value > info_positions['total_value'] + (info_positions['total_value'] * self.profit_per) or (data['rsi'] is not None and data['rsi'] > 70)):
                 self.remove_position(data['symbol'], market_value, date)
                 self.print_sell(date, data, info_positions, 'PROFIT')
                 self.wins += 1
@@ -74,7 +81,7 @@ class Portfolio:
 
             # # Loss
             if info_positions['total_nb'] > 0 and \
-                market_value < info_positions['total_value'] - (info_positions['total_value'] * self.loss_per):
+                (market_value < info_positions['total_value'] - (info_positions['total_value'] * self.loss_per) or (data['rsi'] is not None and data['rsi'] > 70)):
                 self.remove_position(data['symbol'], market_value, date)
                 self.print_sell(date, data, info_positions, 'LOSS')
                 return True
