@@ -1,6 +1,10 @@
 import csv
 
 class PaperApi:
+    def are_markets_open(self, date):
+        test = self.get('CTC-A.TO', date)
+        return test is not None
+
     def get(self, symbol, date):
         csv_file = csv.reader(open(f'data/{symbol}.csv', 'r'), delimiter=',')
         for i, row in enumerate(csv_file):

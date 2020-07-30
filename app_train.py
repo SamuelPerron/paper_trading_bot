@@ -36,7 +36,9 @@ class TrainingBot:
                 for time in time_of_day:
                     self.make_action(symbol, date, time)
                     self.portfolio.refresh_market_value(date)
-            self.portfolio.snapshot(date)
+            api = PaperApi()
+            if api.are_markets_open(date):
+                self.portfolio.snapshot(date)
         print(f'''
             Final portfolio:
             Capital: {round(self.portfolio.capital, 2)}$
