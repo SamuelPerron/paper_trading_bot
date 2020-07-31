@@ -32,6 +32,15 @@ class Alpaca:
         return float(self.distant.get_account().buying_power)
 
 
+    def get_account(self):
+        account = self.distant.get_account()
+        return {
+            'capital': account.portfolio_value,
+            'cash': account.cash,
+            'positions_value': sum([float(p.market_value) for p in self.positions()]),
+        }
+
+
     def buy(self, symbol, qty, take_profit, stop_loss):
         self.distant.submit_order(
             symbol=symbol,

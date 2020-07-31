@@ -6,7 +6,7 @@ class TrainingBot:
     def __init__(self, profit_per, loss_per, position_size):
         self.api = Alpaca(
             'PK8EKE8VGG6HF218VV69', 'sOvmOYZw7Y4WufN4Uvn3jiMm6ztFgYEsBwSzgW8K',
-            '1Min',
+            '5Min',
         )
         self.period = 5 # Always in minutes for now (1, 5 or 15)
         self.minutes = self.get_minutes()
@@ -14,6 +14,7 @@ class TrainingBot:
         self.profit_per = profit_per
         self.loss_per = loss_per
         self.position_size = position_size
+        self.psa()
         self.run()
 
 
@@ -36,7 +37,17 @@ class TrainingBot:
                         data = self.api.compute(position.symbol)
                         self.check_sell(data, position)
 
+                    self.psa()
                     time.sleep(60)
+
+
+    def psa(self):
+        account = self.api.get_account()
+
+        print('----------------------------------------------------------------------------------------')
+        print(f"{datetime.now().strftime('%H:%M:%S')} | Cash: {account['cash']}$ | Positions value: {account['positions_value']}$ | Portfolio value: {account['capital']}$")
+        print('----------------------------------------------------------------------------------------')
+
 
 
     def check_buy(self, data, positions):
@@ -57,7 +68,7 @@ class TrainingBot:
                         )
                     )
                     return True
-        print(f"{data['timestamp'].time()} |  --  | {data['symbol']} |")
+        print(f"{data['timestamp'].time()} |  --  | {data['symbol']: <4} | {data['close']}$ | {round(data['rsi'], 2)} rsi | {round(data['10_avg'], 2)}$ 10MA | {round(data['50_avg'], 2)}$ 50MA")
 
 
     def check_sell(self, data, position):
