@@ -2,7 +2,7 @@ import csv
 
 class PaperApi:
     def are_markets_open(self, date):
-        test = self.get('CTC-A.TO', date)
+        test = self.get('MRU.TO', date)
         return test is not None
 
     def get(self, symbol, date):

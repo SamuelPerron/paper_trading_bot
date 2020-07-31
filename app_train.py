@@ -12,7 +12,8 @@ class TrainingBot:
     def __init__(self, profit_per, loss_per, position_size, date_start, date_end):
         self.api = PaperApi()
         self.portfolio = self.get_portfolio(profit_per, loss_per, position_size)
-        self.symbols = ['AC.TO', 'ACB.TO', 'CTC-A.TO', 'GBR.V', 'BBD-B.TO', 'FVL.TO', 'RTN.V', 'SJR-B.TO']
+        # self.symbols = ['AC.TO', 'ACB.TO', 'CTC-A.TO', 'GBR.V', 'BBD-B.TO', 'FVL.TO', 'RTN.V', 'SJR-B.TO']
+        self.symbols = ['ATD-B.TO', 'CTC-A.TO', 'DOL.TO', 'TWTR', 'LSPD.TO', 'MRU.TO', 'PLUG', 'SHOP.TO']
         self.date_start = date_start
         self.date_end = date_end
 
@@ -97,8 +98,8 @@ bot = TrainingBot(
     profit_per=0.06,
     loss_per=0.03,
     position_size=0.15,
-    date_start='2018-05-08',
-    date_end='2020-05-08'
+    date_start='1995-01-01',
+    date_end='2020-07-30'
 )
 bot.delete_old_data()
 bot.run()

@@ -106,7 +106,7 @@ class Portfolio:
             self.capital =  self.capital - bought_price
             self.refresh_market_value(date)
             self.total_trades += 1
-            # print(f'{date} | BUY | {symbol} x{nb}')
+            print(f'{date} | BUY | {symbol} x{nb} for {round(bought_price, 2)}$')
 
     def check_for_buy(self, data, date, time):
         if data is not None:
