@@ -106,14 +106,14 @@ class Portfolio:
             self.capital =  self.capital - bought_price
             self.refresh_market_value(date)
             self.total_trades += 1
-            print(f'{date} | BUY | {symbol} x{nb} for {round(bought_price, 2)}$')
+            # print(f'{date} | BUY | {symbol} x{nb} for {round(bought_price, 2)}$')
 
     def check_for_buy(self, data, date, time):
         if data is not None:
             already_existing = [position for position in self.positions if position['symbol'] == data['symbol']]
             if not len(already_existing):
-                if (data['10d_avg'] > 0 and data['50d_avg'] > 0) and\
-                    data['10d_avg'] > data['50d_avg'] and\
+                if (data['50d_avg'] > 0 and data['200d_avg'] > 0) and\
+                    data['50d_avg'] > data['200d_avg'] and\
                     data['rsi'] < 30:
                     max_price = self.position_size * self.capital
                     nb_actions = int(round((max_price / float(data[time])), 0))
