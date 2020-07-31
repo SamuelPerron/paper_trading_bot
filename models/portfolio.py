@@ -54,8 +54,8 @@ class Portfolio:
             self.low = self.total_value
 
 
-    def remove_position(self, symbol, new_value, date):
-        new_positions = [position for position in self.positions if position['symbol'] != symbol]
+    def remove_position(self, id, new_value, date):
+        new_positions = [position for position in self.positions if position['id'] != id]
         self.positions = new_positions
         self.capital += new_value
         if self.best_trade < new_value:
@@ -67,46 +67,41 @@ class Portfolio:
         self.refresh_market_value(date)
 
     def print_sell(self, date, data, position, result, market_value):
-        print(f"{date} | {result} | {data['symbol']} x{position['total_nb']} | {round(market_value - position['total_value'], 5)}$")
+        print(f"{date} | {result} | {data['symbol']} x{position['nb']} | {round(market_value - (position['bought_price']), 5)}$")
 
     def check_for_sale(self, data, date, time):
         if data is not None:
-            info_positions = {'total_nb': 0, 'total_value': 0}
             for position in self.positions:
                 if position['symbol'] == data['symbol']:
-                    info_positions['total_nb'] += position['nb']
-                    info_positions['total_value'] += position['bought_price']
+                    market_value = float(data[time]) * position['nb']
+                    # Profit
+                    # limit_bottom_rsi = (data['rsi'] is not None and data['rsi'] < 30)
+                    limit_top_rsi = (data['rsi'] is not None and data['rsi'] > 70)
+                    if position['nb'] > 0 and (limit_top_rsi or market_value > position['stop_win']):
+                        self.remove_position(position['id'], market_value, date)
+                        self.print_sell(date, data, position, 'PROFIT', market_value)
+                        self.wins += 1
+                        return True
 
-            market_value = float(data[time]) * info_positions['total_nb']
-            # Profit
-            limit_bottom_rsi = (data['rsi'] is not None and data['rsi'] < 30)
-            limit_top_rsi = (data['rsi'] is not None and data['rsi'] > 70)
-            if info_positions['total_nb'] > 0 and\
-                (market_value > info_positions['total_value'] + (info_positions['total_value'] * self.profit_per) or\
-                limit_top_rsi):
-                self.remove_position(data['symbol'], market_value, date)
-                self.print_sell(date, data, info_positions, 'PROFIT', market_value)
-                self.wins += 1
-                return True
-
-            # Loss
-            if info_positions['total_nb'] > 0 and \
-                (market_value < info_positions['total_value'] - (info_positions['total_value'] * self.loss_per) or\
-                limit_top_rsi):
-                # data['5d_avg'] < data['50d_avg']):
-                self.remove_position(data['symbol'], market_value, date)
-                self.print_sell(date, data, info_positions, ' LOSS ', market_value)
-                return True
+                    # Loss
+                    if position['nb'] > 0 and \
+                        (market_value < position['stop_loss']):
+                        self.remove_position(position['id'], market_value, date)
+                        self.print_sell(date, data, position, ' LOSS ', market_value)
+                        return True
         return False
 
     def add_position(self, symbol, nb, bought_price, avg_price, date):
         if nb > 0:
             self.positions.append({
+                'id': hash(f'{symbol} / {bought_price}'),
                 'symbol': symbol,
                 'nb': nb,
                 'bought_price': bought_price,
                 'avg_price': avg_price,
                 'date': date,
+                'stop_win': bought_price + (bought_price * self.profit_per),
+                'stop_loss': bought_price - (bought_price * self.loss_per),
             })
             self.capital =  self.capital - bought_price
             self.refresh_market_value(date)
@@ -115,17 +110,19 @@ class Portfolio:
 
     def check_for_buy(self, data, date, time):
         if data is not None:
-            if (data['50d_avg'] > 0 and data['200d_avg'] > 0) and\
-                data['50d_avg'] > data['200d_avg'] and\
-                data['rsi'] < 70:
-                max_price = self.position_size * self.capital
-                nb_actions = int(round((max_price / float(data[time])), 0))
-                self.add_position(
-                    data['symbol'],
-                    nb_actions,
-                    nb_actions * float(data[time]),
-                    float(data[time]),
-                    date
-                )
-                return True
+            already_existing = [position for position in self.positions if position['symbol'] == data['symbol']]
+            if not len(already_existing):
+                if (data['10d_avg'] > 0 and data['50d_avg'] > 0) and\
+                    data['10d_avg'] > data['50d_avg'] and\
+                    data['rsi'] < 30:
+                    max_price = self.position_size * self.capital
+                    nb_actions = int(round((max_price / float(data[time])), 0))
+                    self.add_position(
+                        data['symbol'],
+                        nb_actions,
+                        nb_actions * float(data[time]),
+                        float(data[time]),
+                        date,
+                    )
+                    return True
         return False

@@ -94,8 +94,8 @@ class TrainingBot:
 
 
 bot = TrainingBot(
-    profit_per=0.018,
-    loss_per=0.01,
+    profit_per=0.11,
+    loss_per=0.09,
     position_size=0.11,
     date_start='2018-05-08',
     date_end='2020-05-08'
