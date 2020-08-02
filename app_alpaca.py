@@ -45,7 +45,7 @@ class TrainingBot:
         account = self.api.get_account()
 
         print('----------------------------------------------------------------------------------------')
-        print(f"{datetime.now().strftime('%H:%M:%S')} | Cash: {account['cash']}$ | Positions value: {account['positions_value']}$ | Portfolio value: {account['capital']}$")
+        print(f"{datetime.now().strftime('%H:%M:%S')} | Portfolio value: {account['capital']}$ | Today P/L: {account['today_pl']}$ | Open positions: {account['nb_positions']}")
         print('----------------------------------------------------------------------------------------')
 
 

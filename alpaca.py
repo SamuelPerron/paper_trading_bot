@@ -38,6 +38,8 @@ class Alpaca:
             'capital': account.portfolio_value,
             'cash': account.cash,
             'positions_value': sum([float(p.market_value) for p in self.positions()]),
+            'today_pl': round(float(account.equity) - float(account.last_equity), 2),
+            'nb_positions': len(self.positions()),
         }
 
 
