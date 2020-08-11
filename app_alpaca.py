@@ -11,7 +11,7 @@ class TrainingBot:
         )
         self.period = 5 # Always in minutes for now (1, 5 or 15)
         self.minutes = self.get_minutes()
-        self.symbols = ['PINS', 'GSHD', 'SRNE', 'SEM', 'EBS']
+        self.symbols = []
         self.profit_per = profit_per
         self.loss_per = loss_per
         self.position_size = position_size
@@ -58,9 +58,9 @@ class TrainingBot:
             # 5 minutes before markets open
             if not open and not pre_market_fetched and (datetime.now().minute == 55 and datetime.now().hour == 8):
                 print(self.hr)
-                symbols = self.api.fetch_pre_market()
+                self.symbols = self.api.fetch_pre_market()
                 print('Trading symbols for the day:')
-                for symbol in symbols:
+                for symbol in self.symbols:
                     print(f"{symbol['s']} | {symbol['p']} | {symbol['c']} | {symbol['v']}")
                 pre_market_fetched = True
 
