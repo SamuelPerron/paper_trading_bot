@@ -1,0 +1,2 @@
+ALPACA_UID = ''
+ALPACA_SECRET = ''

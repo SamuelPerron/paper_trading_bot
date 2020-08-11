@@ -1,3 +1,4 @@
+from dotenv import ALPACA_UID, ALPACA_SECRET
 from alpaca import Alpaca
 from datetime import datetime
 import time
@@ -5,7 +6,7 @@ import time
 class TrainingBot:
     def __init__(self, profit_per, loss_per, position_size):
         self.api = Alpaca(
-            'PK8EKE8VGG6HF218VV69', 'sOvmOYZw7Y4WufN4Uvn3jiMm6ztFgYEsBwSzgW8K',
+            ALPACA_UID, ALPACA_SECRET,
             '5Min',
         )
         self.period = 5 # Always in minutes for now (1, 5 or 15)
@@ -14,6 +15,8 @@ class TrainingBot:
         self.profit_per = profit_per
         self.loss_per = loss_per
         self.position_size = position_size
+        self.hr = '--------------------------------------------------------------------------------'
+
         self.psa()
         self.run()
 
@@ -24,9 +27,17 @@ class TrainingBot:
 
 
     def run(self):
+        open = False
+        notified = False
+        pre_market_fetched = False
+
         while True:
             if datetime.now().minute in self.minutes: # Every x minutes
                 if self.api.are_markets_open(): # Not on the same line as to not spam the API
+                    open = True
+                    notified = False
+                    pre_market_fetched = False
+
                     positions = self.api.positions()
 
                     for symbol in self.symbols:
@@ -40,14 +51,25 @@ class TrainingBot:
                     self.psa()
                     time.sleep(60)
 
+            if not open and not notified:
+                print('Markets are closed.')
+                notified = True
+
+            # 5 minutes before markets open
+            if not open and not pre_market_fetched and (datetime.now().minute == 55 and datetime.now().hour == 8):
+                print(self.hr)
+                symbols = self.api.fetch_pre_market()
+                print('Trading symbols for the day:')
+                for symbol in symbols:
+                    print(f"{symbol['s']} | {symbol['p']} | {symbol['c']} | {symbol['v']}")
+                pre_market_fetched = True
+
 
     def psa(self):
         account = self.api.get_account()
-
-        print('----------------------------------------------------------------------------------------')
+        print(self.hr)
         print(f"{datetime.now().strftime('%H:%M:%S')} | Portfolio value: {account['capital']}$ | Today P/L: {account['today_pl']}$ | Open positions: {account['nb_positions']}")
-        print('----------------------------------------------------------------------------------------')
-
+        print(self.hr)
 
 
     def check_buy(self, data, positions):

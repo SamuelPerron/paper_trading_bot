@@ -1,5 +1,7 @@
 import alpaca_trade_api as tradeapi
 from datetime import datetime
+from bs4 import BeautifulSoup
+import requests
 
 
 class Alpaca:
@@ -10,6 +12,7 @@ class Alpaca:
             base_url='https://paper-api.alpaca.markets'
         )
         self.timeframe = timeframe
+        self.max_nb_positions = 5
 
 
     def are_markets_open(self):
@@ -30,6 +33,40 @@ class Alpaca:
 
     def capital(self):
         return float(self.distant.get_account().buying_power)
+
+
+    def fetch_pre_market(self):
+        symbols = []
+        positions = self.positions()
+
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0'}
+        r = requests.get('https://thestockmarketwatch.com/markets/pre-market/today.aspx', headers=headers)
+        if r.status_code == 200:
+            s = BeautifulSoup(r.text, 'html.parser')
+            table = s.find('table', {'id': 'tblMoversDesktop'})
+            rows = table.find_all('tr')
+            rows.pop(0)
+            for row in rows:
+                if len(symbols) <= self.max_nb_positions - len(positions):
+                    volume = int(row.find('td', {'class': 'tdVolume'}).text)
+                    if volume >= 10000:
+                        symbols.append({
+                            's': row.find('a', {'class': 'symbol'}).text, # Symbol
+                            'p': row.find('div', {'class': 'lastPrice'}).text, # Last price
+                            'c': row.find('div', {'class': 'chgUp'}).text, # Change percentage
+                            'v': volume, # Volume
+                        })
+
+            for position in positions:
+                q = self.get(position.symbol)
+                symbols.append({
+                    's': position.symbol,
+                    'p': f'${q.askprice}',
+                    'c': '-',
+                    'v': '-',
+                })
+
+        return symbols
 
 
     def get_account(self):
