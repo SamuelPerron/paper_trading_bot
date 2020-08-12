@@ -56,7 +56,7 @@ class TrainingBot:
                 notified = True
 
             # 5 minutes before markets open
-            if not open and not pre_market_fetched and (datetime.now().minute == 55 and datetime.now().hour == 8):
+            if not open and not pre_market_fetched and (datetime.now().minute == 25 and datetime.now().hour == 9):
                 print(self.hr)
                 self.symbols = self.api.fetch_pre_market()
                 print('Trading symbols for the day:')
