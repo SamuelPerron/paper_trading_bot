@@ -16,7 +16,13 @@ class Alpaca:
 
 
     def are_markets_open(self):
-        return self.distant.get_clock().is_open
+        is_open = False
+        now = datetime.now()
+        if now.hour >= 9 and now.hour < 16:
+            if now.hour == 9 and now.minutes < 30:
+                return False
+            is_open = self.distant.get_clock().is_open
+        return is_open
 
 
     def get(self, symbol):
