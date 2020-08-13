@@ -1,4 +1,4 @@
-from models import Portfolio
+from .portfolio import Portfolio
 import time
 from datetime import datetime, timedelta
 import csv
