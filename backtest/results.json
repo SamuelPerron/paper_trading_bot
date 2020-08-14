@@ -1,0 +1,16 @@
+[
+    {
+        "strategy_id": 1,
+        "symbol": "CTC-A.TO",
+        "nb_entries": 76,
+        "nb_exits": 76,
+        "starting_capital": 1000,
+        "ending_capital": 1355.7675890000005,
+        "highest_capital": 1428.0058260000005,
+        "lowest_capital": 1000.0,
+        "avg_capital": 1195.7145099746426,
+        "median_capital": 1163.6470580000002,
+        "true_change": 355.7675890000005,
+        "pct_change": 0.3557675890000005
+    }
+]
