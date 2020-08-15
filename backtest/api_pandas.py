@@ -6,6 +6,8 @@ class ApiPandas(PaperApi):
         self.symbol = symbol
         self.df = self.get_df()
         self.df['RSI'] = self.get_rsi()
+        self.df['5d_ma'] = self.get_ma(50)
+        self.df['10d_ma'] = self.get_ma(50)
         self.df['50d_ma'] = self.get_ma(50)
         self.df['200d_ma'] = self.get_ma(200)
 

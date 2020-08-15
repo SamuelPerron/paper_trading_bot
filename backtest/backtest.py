@@ -19,10 +19,14 @@ class Backtest():
         self.current_capital = INITIAL_CAPITAL
         self.nb_positions = 0
         self.strategy_id = strategy
+        self.current_stop_loss = None
+        self.current_take_gain = None
 
         try:
             self.strategy = strategies_obj[strategy - 1]
             self.position_size = self.strategy['position_size']
+            self.stop_loss = self.strategy['stop_loss']
+            self.take_gain = self.strategy['take_gain']
         except IndexError:
             raise ValueError(f'This strategy ({strategy}) does not exist.')
 
@@ -44,7 +48,8 @@ class Backtest():
 
     def check_exit(self, date):
         data = self.api.df.loc[date]
-        return data['RSI'] >= 70 and\
+        return (data['RSI'] >= 70 or\
+            data['Adj Close'] <= self.current_stop_loss or data['Adj Close'] >= self.current_take_gain) and\
             (self.nb_positions >= 1)
 
 
@@ -63,12 +68,16 @@ class Backtest():
                     self.entries = self.entries.append(stats, ignore_index=True)
                     self.current_capital -= qty * row['Adj Close']
                     self.nb_positions += qty
+                    self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
+                    self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
                     print(f'Buy {qty}')
 
-            elif self.check_exit(date):
+            elif self.nb_positions > 0 and self.check_exit(date):
                 self.exits = self.exits.append(stats, ignore_index=True)
                 self.current_capital += row['Adj Close'] * self.nb_positions
                 self.nb_positions -= self.nb_positions
+                self.current_stop_loss = None
+                self.current_take_gain = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
 
