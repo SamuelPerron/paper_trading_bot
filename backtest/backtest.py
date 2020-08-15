@@ -22,6 +22,7 @@ class Backtest():
         self.current_stop_loss = None
         self.current_take_gain = None
         self.current_trailing = None
+        self.current_entry_price = None
         self.nb_wins = 0
         self.nb_loss = 0
 
@@ -83,8 +84,10 @@ class Backtest():
                 qty = int(round(perc_capital / row['Adj Close'], 0))
                 if qty > 0:
                     self.entries = self.entries.append(stats, ignore_index=True)
-                    self.current_capital -= qty * row['Adj Close']
-                    self.nb_positions += qty
+                    price = qty * row['Adj Close']
+                    self.current_capital -= price
+                    self.nb_positions = qty
+                    self.current_entry_price = price
                     self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
                     self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
                     self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
@@ -93,14 +96,15 @@ class Backtest():
             elif self.nb_positions > 0 and self.check_exit(row):
                 self.exits = self.exits.append(stats, ignore_index=True)
                 self.current_capital += row['Adj Close'] * self.nb_positions
-                self.nb_positions -= self.nb_positions
-                if row['Adj Close'] <= self.current_stop_loss:
+                if (row['Adj Close'] * self.nb_positions) < self.current_entry_price:
                     self.nb_loss += 1
                 else:
                     self.nb_wins += 1
+                self.nb_positions -= self.nb_positions
                 self.current_stop_loss = None
                 self.current_take_gain = None
                 self.current_trailing = None
+                self.current_entry_price = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
 

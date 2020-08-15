@@ -43,7 +43,7 @@
         "highest_capital": 1195.4100000000003,
         "lowest_capital": 956.45,
         "avg_capital": 1056.6111133200798,
-        "median_capital": 1000.0,
+        "median_capital": 1000,
         "true_change": 191.6700000000003,
         "pct_change": 0.1916700000000003,
         "loss": 37,
@@ -60,7 +60,7 @@
         "highest_capital": 1035.5600120000001,
         "lowest_capital": 903.4300620000001,
         "avg_capital": 991.598484284091,
-        "median_capital": 1000.0,
+        "median_capital": 1000,
         "true_change": -21.60996799999998,
         "pct_change": -0.02160996799999998,
         "loss": 16,
@@ -75,7 +75,7 @@
         "starting_capital": 1000,
         "ending_capital": 1642.4401149999997,
         "highest_capital": 1660.7901209999998,
-        "lowest_capital": 1000.0,
+        "lowest_capital": 1000,
         "avg_capital": 1276.8191983118775,
         "median_capital": 1255.0798860000002,
         "true_change": 642.4401149999997,
@@ -97,9 +97,9 @@
         "median_capital": 1022.3844160000002,
         "true_change": 141.36809600000015,
         "pct_change": 0.14136809600000014,
-        "loss": 226,
-        "wins": 0,
-        "winrate": 0.0
+        "loss": 125,
+        "wins": 101,
+        "winrate": 0.4469026548672566
     },
     {
         "strategy_id": 2,
@@ -114,9 +114,9 @@
         "median_capital": 1307.3804624999998,
         "true_change": 480.914851,
         "pct_change": 0.480914851,
-        "loss": 70,
-        "wins": 0,
-        "winrate": 0.0
+        "loss": 32,
+        "wins": 38,
+        "winrate": 0.5428571428571428
     },
     {
         "strategy_id": 2,
@@ -131,9 +131,9 @@
         "median_capital": 1006.0000000000001,
         "true_change": 301.2999999999997,
         "pct_change": 0.30129999999999973,
-        "loss": 47,
-        "wins": 0,
-        "winrate": 0.0
+        "loss": 22,
+        "wins": 25,
+        "winrate": 0.5319148936170213
     },
     {
         "strategy_id": 2,
@@ -148,9 +148,9 @@
         "median_capital": 1000.0,
         "true_change": -27.369986000000154,
         "pct_change": -0.027369986000000155,
-        "loss": 16,
-        "wins": 0,
-        "winrate": 0.0
+        "loss": 13,
+        "wins": 3,
+        "winrate": 0.1875
     },
     {
         "strategy_id": 2,
@@ -165,8 +165,8 @@
         "median_capital": 1278.9799580000004,
         "true_change": 848.9598920000005,
         "pct_change": 0.8489598920000005,
-        "loss": 88,
-        "wins": 0,
-        "winrate": 0.0
+        "loss": 43,
+        "wins": 45,
+        "winrate": 0.5113636363636364
     }
 ]
