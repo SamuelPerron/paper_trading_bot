@@ -21,6 +21,7 @@ class Backtest():
         self.strategy_id = strategy
         self.current_stop_loss = None
         self.current_take_gain = None
+        self.current_trailing = None
         self.nb_wins = 0
         self.nb_loss = 0
 
@@ -31,6 +32,8 @@ class Backtest():
             self.take_gain = self.strategy['take_gain']
             self.entry_condition = self.strategy['entry_condition']
             self.exit_condition = self.strategy['exit_condition']
+            self.use_trailing = self.strategy['use_trailing']
+            self.trailing = self.strategy['trailing']
         except IndexError:
             raise ValueError(f'This strategy ({strategy}) does not exist.')
 
@@ -50,13 +53,19 @@ class Backtest():
 
 
     def check_exit(self, data):
-        return (eval(self.exit_condition) or\
+        return ((eval(self.exit_condition)) or\
             data['Adj Close'] <= self.current_stop_loss) and\
             (self.nb_positions >= 1)
 
 
     def update_capital(self, date, move):
         self.capital = self.capital.append({ 'date': date, 'capital': self.current_capital + move }, ignore_index=True)
+
+
+    def update_trailing(self, price):
+        if self.current_trailing and price >= self.current_trailing:
+            self.current_stop_loss = price - (price * self.stop_loss)
+            self.current_trailing = price + (price * self.trailing)
 
 
     def run(self):
@@ -66,9 +75,8 @@ class Backtest():
 
             stats = {'date': date, 'price': row['Adj Close']}
 
-            if self.current_take_gain and row['Adj Close'] >= self.current_take_gain:
-                self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
-                self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
+            if self.use_trailing:
+                self.update_trailing(row['Adj Close'])
 
             if self.check_entry(row):
                 perc_capital = self.current_capital * self.position_size
@@ -79,6 +87,7 @@ class Backtest():
                     self.nb_positions += qty
                     self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
                     self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
+                    self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
                     print(f'Buy {qty}')
 
             elif self.nb_positions > 0 and self.check_exit(row):
@@ -91,6 +100,7 @@ class Backtest():
                     self.nb_wins += 1
                 self.current_stop_loss = None
                 self.current_take_gain = None
+                self.current_trailing = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
 
