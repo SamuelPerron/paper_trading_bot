@@ -21,12 +21,16 @@ class Backtest():
         self.strategy_id = strategy
         self.current_stop_loss = None
         self.current_take_gain = None
+        self.nb_wins = 0
+        self.nb_loss = 0
 
         try:
             self.strategy = strategies_obj[strategy - 1]
             self.position_size = self.strategy['position_size']
             self.stop_loss = self.strategy['stop_loss']
             self.take_gain = self.strategy['take_gain']
+            self.entry_condition = self.strategy['entry_condition']
+            self.exit_condition = self.strategy['exit_condition']
         except IndexError:
             raise ValueError(f'This strategy ({strategy}) does not exist.')
 
@@ -40,15 +44,13 @@ class Backtest():
         return marks
 
 
-    def check_entry(self, date):
-        data = self.api.df.loc[date]
-        return data['RSI'] <= 30 and\
+    def check_entry(self, data):
+        return (eval(self.entry_condition)) and\
             (self.current_capital > 0 and self.nb_positions == 0)
 
 
-    def check_exit(self, date):
-        data = self.api.df.loc[date]
-        return (data['RSI'] >= 70 or\
+    def check_exit(self, data):
+        return (eval(self.exit_condition) or\
             data['Adj Close'] <= self.current_stop_loss) and\
             (self.nb_positions >= 1)
 
@@ -59,13 +61,16 @@ class Backtest():
 
     def run(self):
         for date, row in self.api.df.iterrows():
+            if self.nb_positions < 0 or self.current_capital < 0:
+                raise ValueError(f'Problem with state. \nnb_positions: {self.nb_positions}\ncurrent_capital: {self.current_capital}')
+
             stats = {'date': date, 'price': row['Adj Close']}
 
             if self.current_take_gain and row['Adj Close'] >= self.current_take_gain:
                 self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
                 self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
 
-            if self.check_entry(date):
+            if self.check_entry(row):
                 perc_capital = self.current_capital * self.position_size
                 qty = int(round(perc_capital / row['Adj Close'], 0))
                 if qty > 0:
@@ -76,10 +81,14 @@ class Backtest():
                     self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
                     print(f'Buy {qty}')
 
-            elif self.nb_positions > 0 and self.check_exit(date):
+            elif self.nb_positions > 0 and self.check_exit(row):
                 self.exits = self.exits.append(stats, ignore_index=True)
                 self.current_capital += row['Adj Close'] * self.nb_positions
                 self.nb_positions -= self.nb_positions
+                if row['Adj Close'] <= self.current_stop_loss:
+                    self.nb_loss += 1
+                else:
+                    self.nb_wins += 1
                 self.current_stop_loss = None
                 self.current_take_gain = None
 
@@ -119,7 +128,7 @@ class Backtest():
 
         axes[0].set_title(f'{self.symbol} stock price')
         axes[1].set_title('Capital over time')
-        plt.savefig('backtest.png')
+        plt.savefig(f'results/{self.symbol}-{self.strategy_id}.png')
 
 
     def save_results(self):
@@ -135,7 +144,10 @@ class Backtest():
             'avg_capital': float(self.capital.mean()['capital']),
             'median_capital': float(self.capital.median()['capital']),
             'true_change': float(self.capital.tail(n=1)['capital']) - float(self.capital.head(n=1)['capital']),
-            'pct_change': (float(self.capital.tail(n=1)['capital']) - float(self.capital.head(n=1)['capital'])) / float(self.capital.head(n=1)['capital'])
+            'pct_change': (float(self.capital.tail(n=1)['capital']) - float(self.capital.head(n=1)['capital'])) / float(self.capital.head(n=1)['capital']),
+            'loss': self.nb_loss,
+            'wins': self.nb_wins,
+            'winrate': self.nb_wins / (self.nb_wins + self.nb_loss)
         }
 
         with open('results.json', 'r') as results_file:
@@ -150,4 +162,8 @@ class Backtest():
 
 
 
-Backtest('CTC-A.TO', 1)
+Backtest('CTC-A.TO', 2)
+Backtest('DOL.TO', 2)
+Backtest('GBR.V', 2)
+Backtest('LSPD.TO', 2)
+Backtest('SHOP.TO', 2)

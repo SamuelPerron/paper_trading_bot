@@ -5,6 +5,8 @@
         "position_size": 0.15,
         "stop_loss": 0.03,
         "take_gain": 0.06,
-        "can_buy_multiple": false
+        "can_buy_multiple": false,
+        "entry_condition": "data['50d_ma'] > data['200d_ma']",
+        "exit_condition": "data['RSI'] >= 70"
     }
 ]
