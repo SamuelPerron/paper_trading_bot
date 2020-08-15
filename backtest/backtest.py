@@ -1,6 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import pandas as pd
+from os import walk
 from api_pandas import ApiPandas
 
 INITIAL_CAPITAL = 1000
@@ -146,6 +147,10 @@ class Backtest():
 
 
     def save_results(self):
+        try:
+            winrate = self.nb_wins / (self.nb_wins + self.nb_loss)
+        except ZeroDivisionError:
+            winrate = 0
         to_save = {
             'strategy_id': self.strategy_id,
             'symbol': self.symbol,
@@ -161,7 +166,7 @@ class Backtest():
             'pct_change': (float(self.capital.tail(n=1)['capital']) - float(self.capital.head(n=1)['capital'])) / float(self.capital.head(n=1)['capital']),
             'loss': self.nb_loss,
             'wins': self.nb_wins,
-            'winrate': self.nb_wins / (self.nb_wins + self.nb_loss)
+            'winrate': winrate
         }
 
         with open('results.json', 'r') as results_file:
@@ -176,8 +181,54 @@ class Backtest():
 
 
 
-Backtest('CTC-A.TO', 2)
-Backtest('DOL.TO', 2)
-Backtest('GBR.V', 2)
-Backtest('LSPD.TO', 2)
-Backtest('SHOP.TO', 2)
+class Launcher():
+    def __init__(self, strategy=None, symbol=None):
+        if strategy:
+            self.strategy = strategy
+            self.symbols = self.get_all_symbols()
+            self.test_all_symbols()
+
+        elif symbol:
+            self.symbol = symbol
+            self.strategies = self.get_all_strategies()
+            self.test_all_strategies()
+
+        else:
+            self.symbols = self.get_all_symbols()
+            self.strategies = self.get_all_strategies()
+            self.test_all()
+
+
+    def get_all_strategies(self):
+        with open('strategies.json', 'r') as strategies_file:
+            strategies = strategies_file.read()
+        strategies_obj = json.loads(strategies)
+        return [strategy['id'] for strategy in strategies_obj]
+
+
+    def get_all_symbols(self):
+        f = []
+        for (dirpath, dirnames, filenames) in walk('data'):
+            f.extend(filenames)
+            break
+        return [symbol[:-4] for symbol in f]
+
+
+    def test_all_strategies(self):
+        for id in self.strategies:
+            Backtest(self.symbol, id)
+
+
+    def test_all_symbols(self):
+        for symbol in self.symbols:
+            Backtest(symbol, self.strategy)
+
+
+    def test_all(self):
+        for symbol in self.symbols:
+            for strategy in self.strategies:
+                Backtest(symbol, strategy)
+
+
+
+Launcher()
