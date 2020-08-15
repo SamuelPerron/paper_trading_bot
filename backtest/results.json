@@ -2,15 +2,15 @@
     {
         "strategy_id": 1,
         "symbol": "CTC-A.TO",
-        "nb_entries": 158,
-        "nb_exits": 158,
+        "nb_entries": 156,
+        "nb_exits": 156,
         "starting_capital": 1000,
-        "ending_capital": 1423.7537159999995,
-        "highest_capital": 1513.030436,
-        "lowest_capital": 1000.0,
-        "avg_capital": 1277.711722270324,
-        "median_capital": 1272.6637619999995,
-        "true_change": 423.7537159999995,
-        "pct_change": 0.4237537159999995
+        "ending_capital": 1333.0680929999978,
+        "highest_capital": 1467.9087869999985,
+        "lowest_capital": 1000,
+        "avg_capital": 1241.7512841984008,
+        "median_capital": 1228.8325679999984,
+        "true_change": 333.0680929999978,
+        "pct_change": 0.3330680929999978
     }
 ]

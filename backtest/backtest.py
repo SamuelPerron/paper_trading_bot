@@ -49,7 +49,7 @@ class Backtest():
     def check_exit(self, date):
         data = self.api.df.loc[date]
         return (data['RSI'] >= 70 or\
-            data['Adj Close'] <= self.current_stop_loss or data['Adj Close'] >= self.current_take_gain) and\
+            data['Adj Close'] <= self.current_stop_loss) and\
             (self.nb_positions >= 1)
 
 
@@ -60,6 +60,10 @@ class Backtest():
     def run(self):
         for date, row in self.api.df.iterrows():
             stats = {'date': date, 'price': row['Adj Close']}
+
+            if self.current_take_gain and row['Adj Close'] >= self.current_take_gain:
+                self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
+                self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
 
             if self.check_entry(date):
                 perc_capital = self.current_capital * self.position_size
