@@ -1,15 +1,16 @@
 import json
 import matplotlib.pyplot as plt
 import pandas as pd
-from os import walk
+from os import walk, path
 from api_pandas import ApiPandas
 
 INITIAL_CAPITAL = 1000
+PATH = path.dirname(path.abspath(__file__))
 
 
-class Backtest():
+class Backtest:
     def __init__(self, symbol, strategy):
-        with open('strategies.json', 'r') as strategies_file:
+        with open(f'{PATH}/strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
 
@@ -143,7 +144,7 @@ class Backtest():
 
         axes[0].set_title(f'{self.symbol} stock price')
         axes[1].set_title('Capital over time')
-        plt.savefig(f'results/{self.symbol}-{self.strategy_id}.png')
+        plt.savefig(f'{PATH}/results/{self.symbol}-{self.strategy_id}.png')
 
     def save_results(self):
         try:
@@ -168,7 +169,7 @@ class Backtest():
             'winrate': winrate
         }
 
-        with open('results.json', 'r') as results_file:
+        with open(f'{PATH}/results.json', 'r') as results_file:
             read_results = results_file.read()
             old = json.loads(read_results)
             already_exists = [True for i in old if i['strategy_id']
@@ -176,7 +177,7 @@ class Backtest():
             if len(already_exists) == 0:
                 old.append(to_save)
 
-        with open('results.json', 'w') as results_file:
+        with open(f'{PATH}/results.json', 'w') as results_file:
             json.dump(old, results_file, indent=4)
 
 
@@ -198,14 +199,14 @@ class Launcher():
             self.test_all()
 
     def get_all_strategies(self):
-        with open('strategies.json', 'r') as strategies_file:
+        with open(f'{PATH}/strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
         return [strategy['id'] for strategy in strategies_obj]
 
     def get_all_symbols(self):
         f = []
-        for (dirpath, dirnames, filenames) in walk('data'):
+        for (dirpath, dirnames, filenames) in walk(f'{PATH}/data'):
             f.extend(filenames)
             break
         return [symbol[:-4] for symbol in f]

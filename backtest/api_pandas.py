@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 
 class ApiPandas():
@@ -12,7 +13,8 @@ class ApiPandas():
         self.df['200d_ma'] = self.get_ma(200)
 
     def get_df(self):
-        return pd.read_csv(f'data/{self.symbol}.csv', index_col=0)
+        path = os.path.dirname(os.path.abspath(__file__))
+        return pd.read_csv(f'{path}/data/{self.symbol}.csv', index_col=0)
 
     def get_rsi(self):
         period = 14
