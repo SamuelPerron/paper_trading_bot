@@ -1,7 +1,7 @@
 import pandas as pd
-from api import PaperApi
 
-class ApiPandas(PaperApi):
+
+class ApiPandas():
     def __init__(self, symbol):
         self.symbol = symbol
         self.df = self.get_df()
@@ -11,16 +11,14 @@ class ApiPandas(PaperApi):
         self.df['50d_ma'] = self.get_ma(50)
         self.df['200d_ma'] = self.get_ma(200)
 
-
     def get_df(self):
         return pd.read_csv(f'data/{self.symbol}.csv', index_col=0)
-
 
     def get_rsi(self):
         period = 14
         close = self.df['Adj Close']
         delta = close.diff()
-        delta = delta[1:] # Remove first entry
+        delta = delta[1:]  # Remove first entry
 
         # Make the positive gains (up) and negative gains (down) Series
         up, down = delta.copy(), delta.copy()
@@ -34,7 +32,6 @@ class ApiPandas(PaperApi):
         # Calculate the RSI based on EWMA
         rs = roll_up1 / roll_down1
         return 100.0 - (100.0 / (1.0 + rs))
-
 
     def get_ma(self, period):
         return self.df['Adj Close'].rolling(window=period).mean()

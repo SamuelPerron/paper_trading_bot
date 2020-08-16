@@ -12,7 +12,8 @@ from ..global_settings import DASHBOARD_API_VERSION, BOT_VERSION
 
 # Settings
 app = FlaskAPI(__name__)
-broker = tradeapi.REST(ALPACA_UID, ALPACA_SECRET, base_url='https://paper-api.alpaca.markets')
+broker = tradeapi.REST(ALPACA_UID, ALPACA_SECRET,
+                       base_url='https://paper-api.alpaca.markets')
 base_url = DASHBOARD_API_URL
 
 # Meta data
@@ -35,6 +36,7 @@ def home():
         'account': f'{DASHBOARD_API_URL}/account',
         'meta': metadata
     }
+
 
 @app.route('/positions')
 def positions():
