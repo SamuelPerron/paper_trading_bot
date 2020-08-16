@@ -2,3 +2,6 @@ data/portfolio.csv
 trading_bot.pem
 dotenv.py
 *.png
+*.orig
+.coverage
+.pytest_cache

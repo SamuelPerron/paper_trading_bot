@@ -1,0 +1,5 @@
+[python]
+bears = PEP8Bear,PyUnusedCodeBear
+files = *.py,backtest/*.py,dashboard_api/*.py
+use_spaces = True
+ignore = **.orig

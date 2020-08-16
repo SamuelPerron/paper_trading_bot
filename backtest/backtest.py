@@ -1,22 +1,24 @@
 import json
 import matplotlib.pyplot as plt
 import pandas as pd
-from os import walk
+from os import walk, path
 from api_pandas import ApiPandas
 
 INITIAL_CAPITAL = 1000
+PATH = path.dirname(path.abspath(__file__))
 
-class Backtest():
+
+class Backtest:
     def __init__(self, symbol, strategy):
-        with open('strategies.json', 'r') as strategies_file:
+        with open(f'{PATH}/strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
 
         self.symbol = symbol
         self.api = ApiPandas(self.symbol)
-        self.entries = pd.DataFrame({ 'date': [], 'price': [] })
-        self.exits = pd.DataFrame({ 'date': [], 'price': [] })
-        self.capital = pd.DataFrame({ 'date': [], 'capital': [] })
+        self.entries = pd.DataFrame({'date': [], 'price': []})
+        self.exits = pd.DataFrame({'date': [], 'price': []})
+        self.capital = pd.DataFrame({'date': [], 'capital': []})
         self.current_capital = INITIAL_CAPITAL
         self.nb_positions = 0
         self.strategy_id = strategy
@@ -41,39 +43,35 @@ class Backtest():
 
         self.run()
 
-
     def find_loc(self, dates):
         marks = []
         for date in dates:
             marks.append(self.api.df.index.get_loc(date))
         return marks
 
-
     def check_entry(self, data):
         return (eval(self.entry_condition)) and\
             (self.current_capital > 0 and self.nb_positions == 0)
 
-
     def check_exit(self, data):
-        return ((eval(self.exit_condition)) or\
-            data['Adj Close'] <= self.current_stop_loss) and\
+        return ((eval(self.exit_condition)) or
+                data['Adj Close'] <= self.current_stop_loss) and\
             (self.nb_positions >= 1)
 
-
     def update_capital(self, date, move):
-        self.capital = self.capital.append({ 'date': date, 'capital': self.current_capital + move }, ignore_index=True)
-
+        self.capital = self.capital.append(
+            {'date': date, 'capital': self.current_capital + move}, ignore_index=True)
 
     def update_trailing(self, price):
         if self.current_trailing and price >= self.current_trailing:
             self.current_stop_loss = price - (price * self.stop_loss)
             self.current_trailing = price + (price * self.trailing)
 
-
     def run(self):
         for date, row in self.api.df.iterrows():
             if self.nb_positions < 0 or self.current_capital < 0:
-                raise ValueError(f'Problem with state. \nnb_positions: {self.nb_positions}\ncurrent_capital: {self.current_capital}')
+                raise ValueError(
+                    f'Problem with state. \nnb_positions: {self.nb_positions}\ncurrent_capital: {self.current_capital}')
 
             stats = {'date': date, 'price': row['Adj Close']}
 
@@ -84,14 +82,18 @@ class Backtest():
                 perc_capital = self.current_capital * self.position_size
                 qty = int(round(perc_capital / row['Adj Close'], 0))
                 if qty > 0:
-                    self.entries = self.entries.append(stats, ignore_index=True)
+                    self.entries = self.entries.append(
+                        stats, ignore_index=True)
                     price = qty * row['Adj Close']
                     self.current_capital -= price
                     self.nb_positions = qty
                     self.current_entry_price = price
-                    self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
-                    self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
-                    self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
+                    self.current_stop_loss = row['Adj Close'] - \
+                        (row['Adj Close'] * self.stop_loss)
+                    self.current_take_gain = row['Adj Close'] + \
+                        (row['Adj Close'] * self.take_gain)
+                    self.current_trailing = row['Adj Close'] + \
+                        (row['Adj Close'] * self.trailing)
                     print(f'Buy {qty}')
 
             elif self.nb_positions > 0 and self.check_exit(row):
@@ -112,7 +114,6 @@ class Backtest():
         self.plot()
         self.save_results()
 
-
     def plot(self):
         fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(20, 10))
         self.capital.index = self.capital['date']
@@ -124,7 +125,7 @@ class Backtest():
 
         self.capital['capital'].plot(ax=axes[1])
 
-        self.api.df['Adj Close'].plot( # Plot entry markers
+        self.api.df['Adj Close'].plot(  # Plot entry markers
             markevery=self.find_loc(self.entries['date']),
             marker='o',
             markerfacecolor='green',
@@ -132,7 +133,7 @@ class Backtest():
             linestyle='',
             ax=axes[0]
         )
-        self.api.df['Adj Close'].plot( # Plot exit markers
+        self.api.df['Adj Close'].plot(  # Plot exit markers
             markevery=self.find_loc(self.exits['date']),
             marker='o',
             markerfacecolor='red',
@@ -143,8 +144,7 @@ class Backtest():
 
         axes[0].set_title(f'{self.symbol} stock price')
         axes[1].set_title('Capital over time')
-        plt.savefig(f'results/{self.symbol}-{self.strategy_id}.png')
-
+        plt.savefig(f'{PATH}/results/{self.symbol}-{self.strategy_id}.png')
 
     def save_results(self):
         try:
@@ -169,16 +169,16 @@ class Backtest():
             'winrate': winrate
         }
 
-        with open('results.json', 'r') as results_file:
+        with open(f'{PATH}/results.json', 'r') as results_file:
             read_results = results_file.read()
             old = json.loads(read_results)
-            already_exists = [True for i in old if i['strategy_id'] == self.strategy_id and i['symbol'] == self.symbol]
+            already_exists = [True for i in old if i['strategy_id']
+                              == self.strategy_id and i['symbol'] == self.symbol]
             if len(already_exists) == 0:
                 old.append(to_save)
 
-        with open('results.json', 'w') as results_file:
+        with open(f'{PATH}/results.json', 'w') as results_file:
             json.dump(old, results_file, indent=4)
-
 
 
 class Launcher():
@@ -198,37 +198,28 @@ class Launcher():
             self.strategies = self.get_all_strategies()
             self.test_all()
 
-
     def get_all_strategies(self):
-        with open('strategies.json', 'r') as strategies_file:
+        with open(f'{PATH}/strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
         return [strategy['id'] for strategy in strategies_obj]
 
-
     def get_all_symbols(self):
         f = []
-        for (dirpath, dirnames, filenames) in walk('data'):
+        for (dirpath, dirnames, filenames) in walk(f'{PATH}/data'):
             f.extend(filenames)
             break
         return [symbol[:-4] for symbol in f]
-
 
     def test_all_strategies(self):
         for id in self.strategies:
             Backtest(self.symbol, id)
 
-
     def test_all_symbols(self):
         for symbol in self.symbols:
             Backtest(symbol, self.strategy)
-
 
     def test_all(self):
         for symbol in self.symbols:
             for strategy in self.strategies:
                 Backtest(symbol, strategy)
-
-
-
-Launcher()
