@@ -101,7 +101,7 @@ class Backtest():
                     self.nb_loss += 1
                 else:
                     self.nb_wins += 1
-                self.nb_positions -= self.nb_positions
+                self.nb_positions = 0
                 self.current_stop_loss = None
                 self.current_take_gain = None
                 self.current_trailing = None
