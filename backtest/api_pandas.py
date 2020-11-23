@@ -1,6 +1,6 @@
 import pandas as pd
 
-class ApiPandas(PaperApi):
+class ApiPandas():
     def __init__(self, symbol):
         self.symbol = symbol
         self.df = self.get_df()
