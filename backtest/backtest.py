@@ -7,13 +7,13 @@ from api_pandas import ApiPandas
 INITIAL_CAPITAL = 1000
 
 class Backtest():
-    def __init__(self, symbol, strategy):
+    def __init__(self, symbol, strategy, intraday):
         with open('strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
 
         self.symbol = symbol
-        self.api = ApiPandas(self.symbol)
+        self.api = ApiPandas(self.symbol, intraday)
         self.entries = pd.DataFrame({ 'date': [], 'price': [] })
         self.exits = pd.DataFrame({ 'date': [], 'price': [] })
         self.capital = pd.DataFrame({ 'date': [], 'capital': [] })
@@ -92,7 +92,6 @@ class Backtest():
                     self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
                     self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
                     self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
-                    print(f'Buy {qty}')
 
             elif self.nb_positions > 0 and self.check_exit(row):
                 self.exits = self.exits.append(stats, ignore_index=True)
@@ -101,13 +100,14 @@ class Backtest():
                     self.nb_loss += 1
                 else:
                     self.nb_wins += 1
-                self.nb_positions -= self.nb_positions
+                self.nb_positions = 0
                 self.current_stop_loss = None
                 self.current_take_gain = None
                 self.current_trailing = None
                 self.current_entry_price = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
+            print(f'{self.symbol} | {date} | {round(self.current_capital, 2)}')
 
         self.plot()
         self.save_results()
@@ -118,8 +118,8 @@ class Backtest():
         self.capital.index = self.capital['date']
 
         self.api.df['Adj Close'].plot(ax=axes[0], label='Adj. close price')
-        self.api.df['50d_ma'].plot(ax=axes[0], label='50 days MA')
-        self.api.df['200d_ma'].plot(ax=axes[0], label='200 days MA')
+        self.api.df['50d_ma'].plot(ax=axes[0], label='50 periods MA')
+        self.api.df['200d_ma'].plot(ax=axes[0], label='200 periods MA')
         axes[0].legend(loc='upper right')
 
         self.capital['capital'].plot(ax=axes[1])
@@ -181,22 +181,28 @@ class Backtest():
 
 
 
-class Launcher():
-    def __init__(self, strategy=None, symbol=None):
-        if strategy:
-            self.strategy = strategy
-            self.symbols = self.get_all_symbols()
-            self.test_all_symbols()
-
-        elif symbol:
-            self.symbol = symbol
-            self.strategies = self.get_all_strategies()
-            self.test_all_strategies()
-
+class Launcher:
+    def __init__(self, strategy=None, symbol=None, intraday=False):
+        self.intraday = intraday
+        if strategy and symbol:
+            Backtest(symbol, strategy, self.intraday)
         else:
-            self.symbols = self.get_all_symbols()
-            self.strategies = self.get_all_strategies()
-            self.test_all()
+
+            if strategy:
+                self.strategy = strategy
+                self.symbols = self.get_all_symbols()
+                self.test_all_symbols()
+
+            elif symbol:
+                print(symbol)
+                self.symbol = symbol
+                self.strategies = self.get_all_strategies()
+                self.test_all_strategies()
+
+            else:
+                self.symbols = self.get_all_symbols()
+                self.strategies = self.get_all_strategies()
+                self.test_all()
 
 
     def get_all_strategies(self):
@@ -216,19 +222,15 @@ class Launcher():
 
     def test_all_strategies(self):
         for id in self.strategies:
-            Backtest(self.symbol, id)
+            Backtest(self.symbol, id, self.intraday)
 
 
     def test_all_symbols(self):
         for symbol in self.symbols:
-            Backtest(symbol, self.strategy)
+            Backtest(symbol, self.strategy, self.intraday)
 
 
     def test_all(self):
         for symbol in self.symbols:
             for strategy in self.strategies:
-                Backtest(symbol, strategy)
-
-
-
-Launcher()
+                Backtest(symbol, strategy, self.intraday)

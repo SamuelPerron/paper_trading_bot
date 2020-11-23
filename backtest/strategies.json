@@ -22,5 +22,41 @@
         "exit_condition": "False",
         "use_trailing": true,
         "trailing": 0.03
+    },
+    {
+        "id": 3,
+        "name": "MACD",
+        "position_size": 0.15,
+        "stop_loss": 0.03,
+        "take_gain": 0.06,
+        "can_buy_multiple": false,
+        "entry_condition": "data['MACD'] > data['MACD Signal']",
+        "exit_condition": "data['MACD'] < data['MACD Signal']",
+        "use_trailing": false,
+        "trailing": 0.03
+    },
+    {
+        "id": 4,
+        "name": "MACD - Trailing",
+        "position_size": 0.15,
+        "stop_loss": 0.03,
+        "take_gain": 0.06,
+        "can_buy_multiple": false,
+        "entry_condition": "data['MACD'] > data['MACD Signal']",
+        "exit_condition": "False",
+        "use_trailing": true,
+        "trailing": 0.03
+    },
+    {
+        "id": 5,
+        "name": "MACD - Zero line",
+        "position_size": 0.15,
+        "stop_loss": 0.03,
+        "take_gain": 0.06,
+        "can_buy_multiple": false,
+        "entry_condition": "data['MACD'] > data['MACD Signal'] and data['MACD'] < 0",
+        "exit_condition": "False",
+        "use_trailing": true,
+        "trailing": 0.03
     }
 ]
