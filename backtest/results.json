@@ -1290,5 +1290,39 @@
         "loss": 105,
         "wins": 63,
         "winrate": 0.375
+    },
+    {
+        "strategy_id": 4,
+        "symbol": "AMD",
+        "nb_entries": 184,
+        "nb_exits": 183,
+        "starting_capital": 1000,
+        "ending_capital": 1160.5978999999988,
+        "highest_capital": 1207.9130999999993,
+        "lowest_capital": 963.7482,
+        "avg_capital": 1089.204409065132,
+        "median_capital": 1096.6745999999994,
+        "true_change": 160.59789999999884,
+        "pct_change": 0.16059789999999885,
+        "loss": 117,
+        "wins": 66,
+        "winrate": 0.36065573770491804
+    },
+    {
+        "strategy_id": 3,
+        "symbol": "AMD",
+        "nb_entries": 995,
+        "nb_exits": 994,
+        "starting_capital": 1000,
+        "ending_capital": 1078.062157999998,
+        "highest_capital": 1126.9411579999987,
+        "lowest_capital": 975.0028999999997,
+        "avg_capital": 1050.6726942521645,
+        "median_capital": 1054.5805999999993,
+        "true_change": 78.06215799999791,
+        "pct_change": 0.07806215799999791,
+        "loss": 602,
+        "wins": 392,
+        "winrate": 0.39436619718309857
     }
 ]

@@ -4,7 +4,6 @@ class ApiPandas():
     def __init__(self, symbol, intraday):
         self.symbol = symbol
         self.df = self.get_df(intraday)
-        print(symbol)
         self.df['RSI'] = self.get_rsi()
         self.df['MACD'] = self.get_macd()
         self.df['MACD Signal'] = self.get_macd_signal()

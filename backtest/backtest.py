@@ -92,7 +92,6 @@ class Backtest():
                     self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
                     self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
                     self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
-                    print(f'Buy {qty}')
 
             elif self.nb_positions > 0 and self.check_exit(row):
                 self.exits = self.exits.append(stats, ignore_index=True)
@@ -108,6 +107,7 @@ class Backtest():
                 self.current_entry_price = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
+            print(f'{self.symbol} | {date} | {round(self.current_capital, 2)}')
 
         self.plot()
         self.save_results()
@@ -118,8 +118,8 @@ class Backtest():
         self.capital.index = self.capital['date']
 
         self.api.df['Adj Close'].plot(ax=axes[0], label='Adj. close price')
-        self.api.df['50d_ma'].plot(ax=axes[0], label='50 days MA')
-        self.api.df['200d_ma'].plot(ax=axes[0], label='200 days MA')
+        self.api.df['50d_ma'].plot(ax=axes[0], label='50 periods MA')
+        self.api.df['200d_ma'].plot(ax=axes[0], label='200 periods MA')
         axes[0].legend(loc='upper right')
 
         self.capital['capital'].plot(ax=axes[1])
