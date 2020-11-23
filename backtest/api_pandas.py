@@ -1,9 +1,10 @@
 import pandas as pd
 
 class ApiPandas():
-    def __init__(self, symbol):
+    def __init__(self, symbol, intraday):
         self.symbol = symbol
-        self.df = self.get_df()
+        self.df = self.get_df(intraday)
+        print(symbol)
         self.df['RSI'] = self.get_rsi()
         self.df['MACD'] = self.get_macd()
         self.df['MACD Signal'] = self.get_macd_signal()
@@ -13,8 +14,11 @@ class ApiPandas():
         self.df['200d_ma'] = self.get_ma(200)
 
 
-    def get_df(self):
-        return pd.read_csv(f'data/{self.symbol}.csv', index_col=0)
+    def get_df(self, intraday):
+        df = pd.read_csv(f'data/{"intraday/" if intraday else ""}{self.symbol}.csv', index_col=0)
+        if intraday:
+            df = df.iloc[::-1]
+        return df
 
 
     def get_rsi(self):

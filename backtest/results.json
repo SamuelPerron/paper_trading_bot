@@ -1273,5 +1273,22 @@
         "loss": 9,
         "wins": 7,
         "winrate": 0.4375
+    },
+    {
+        "strategy_id": 5,
+        "symbol": "AMD",
+        "nb_entries": 169,
+        "nb_exits": 168,
+        "starting_capital": 1000,
+        "ending_capital": 1172.4161999999988,
+        "highest_capital": 1219.731399999999,
+        "lowest_capital": 967.7779,
+        "avg_capital": 1115.393407721264,
+        "median_capital": 1137.4331000000002,
+        "true_change": 172.41619999999875,
+        "pct_change": 0.17241619999999874,
+        "loss": 105,
+        "wins": 63,
+        "winrate": 0.375
     }
 ]

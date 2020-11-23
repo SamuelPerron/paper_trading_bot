@@ -7,13 +7,13 @@ from api_pandas import ApiPandas
 INITIAL_CAPITAL = 1000
 
 class Backtest():
-    def __init__(self, symbol, strategy):
+    def __init__(self, symbol, strategy, intraday):
         with open('strategies.json', 'r') as strategies_file:
             strategies = strategies_file.read()
         strategies_obj = json.loads(strategies)
 
         self.symbol = symbol
-        self.api = ApiPandas(self.symbol)
+        self.api = ApiPandas(self.symbol, intraday)
         self.entries = pd.DataFrame({ 'date': [], 'price': [] })
         self.exits = pd.DataFrame({ 'date': [], 'price': [] })
         self.capital = pd.DataFrame({ 'date': [], 'capital': [] })
@@ -181,22 +181,28 @@ class Backtest():
 
 
 
-class Launcher():
-    def __init__(self, strategy=None, symbol=None):
-        if strategy:
-            self.strategy = strategy
-            self.symbols = self.get_all_symbols()
-            self.test_all_symbols()
-
-        elif symbol:
-            self.symbol = symbol
-            self.strategies = self.get_all_strategies()
-            self.test_all_strategies()
-
+class Launcher:
+    def __init__(self, strategy=None, symbol=None, intraday=False):
+        self.intraday = intraday
+        if strategy and symbol:
+            Backtest(symbol, strategy, self.intraday)
         else:
-            self.symbols = self.get_all_symbols()
-            self.strategies = self.get_all_strategies()
-            self.test_all()
+
+            if strategy:
+                self.strategy = strategy
+                self.symbols = self.get_all_symbols()
+                self.test_all_symbols()
+
+            elif symbol:
+                print(symbol)
+                self.symbol = symbol
+                self.strategies = self.get_all_strategies()
+                self.test_all_strategies()
+
+            else:
+                self.symbols = self.get_all_symbols()
+                self.strategies = self.get_all_strategies()
+                self.test_all()
 
 
     def get_all_strategies(self):
@@ -216,19 +222,15 @@ class Launcher():
 
     def test_all_strategies(self):
         for id in self.strategies:
-            Backtest(self.symbol, id)
+            Backtest(self.symbol, id, self.intraday)
 
 
     def test_all_symbols(self):
         for symbol in self.symbols:
-            Backtest(symbol, self.strategy)
+            Backtest(symbol, self.strategy, self.intraday)
 
 
     def test_all(self):
         for symbol in self.symbols:
             for strategy in self.strategies:
-                Backtest(symbol, strategy)
-
-
-
-Launcher()
+                Backtest(symbol, strategy, self.intraday)
