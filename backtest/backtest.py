@@ -7,11 +7,7 @@ from api_pandas import ApiPandas
 INITIAL_CAPITAL = 1000
 
 class Backtest():
-    def __init__(self, symbol, strategy, intraday):
-        with open('strategies.json', 'r') as strategies_file:
-            strategies = strategies_file.read()
-        strategies_obj = json.loads(strategies)
-
+    def __init__(self, symbol, strategy, intraday=False):
         self.symbol = symbol
         self.api = ApiPandas(self.symbol, intraday)
         self.entries = pd.DataFrame({ 'date': [], 'price': [] })
@@ -27,17 +23,7 @@ class Backtest():
         self.nb_wins = 0
         self.nb_loss = 0
 
-        try:
-            self.strategy = strategies_obj[strategy - 1]
-            self.position_size = self.strategy['position_size']
-            self.stop_loss = self.strategy['stop_loss']
-            self.take_gain = self.strategy['take_gain']
-            self.entry_condition = self.strategy['entry_condition']
-            self.exit_condition = self.strategy['exit_condition']
-            self.use_trailing = self.strategy['use_trailing']
-            self.trailing = self.strategy['trailing']
-        except IndexError:
-            raise ValueError(f'This strategy ({strategy}) does not exist.')
+        self.strategy = strategy
 
         self.run()
 
@@ -50,24 +36,18 @@ class Backtest():
 
 
     def check_entry(self, data):
-        return (eval(self.entry_condition)) and\
+        return self.strategy.check_for_entry_signal(data) and\
             (self.current_capital > 0 and self.nb_positions == 0)
 
 
     def check_exit(self, data):
-        return ((eval(self.exit_condition)) or\
-            data['Adj Close'] <= self.current_stop_loss) and\
-            (self.nb_positions >= 1)
+        return self.nb_positions > 0 and\
+            self.strategy.check_for_exit_signal(
+                data, self.strategy.get_stop_loss(data['Adj Close'], self.current_entry_price))
 
 
     def update_capital(self, date, move):
         self.capital = self.capital.append({ 'date': date, 'capital': self.current_capital + move }, ignore_index=True)
-
-
-    def update_trailing(self, price):
-        if self.current_trailing and price >= self.current_trailing:
-            self.current_stop_loss = price - (price * self.stop_loss)
-            self.current_trailing = price + (price * self.trailing)
 
 
     def run(self):
@@ -77,33 +57,24 @@ class Backtest():
 
             stats = {'date': date, 'price': row['Adj Close']}
 
-            if self.use_trailing:
-                self.update_trailing(row['Adj Close'])
-
             if self.check_entry(row):
-                perc_capital = self.current_capital * self.position_size
+                perc_capital = self.current_capital * self.strategy.position_size
                 qty = int(round(perc_capital / row['Adj Close'], 0))
                 if qty > 0:
                     self.entries = self.entries.append(stats, ignore_index=True)
                     price = qty * row['Adj Close']
                     self.current_capital -= price
                     self.nb_positions = qty
-                    self.current_entry_price = price
-                    self.current_stop_loss = row['Adj Close'] - (row['Adj Close'] * self.stop_loss)
-                    self.current_take_gain = row['Adj Close'] + (row['Adj Close'] * self.take_gain)
-                    self.current_trailing = row['Adj Close'] + (row['Adj Close'] * self.trailing)
+                    self.current_entry_price = row['Adj Close']
 
-            elif self.nb_positions > 0 and self.check_exit(row):
+            elif self.check_exit(row):
                 self.exits = self.exits.append(stats, ignore_index=True)
                 self.current_capital += row['Adj Close'] * self.nb_positions
-                if (row['Adj Close'] * self.nb_positions) < self.current_entry_price:
+                if row['Adj Close'] < self.current_entry_price:
                     self.nb_loss += 1
                 else:
                     self.nb_wins += 1
                 self.nb_positions = 0
-                self.current_stop_loss = None
-                self.current_take_gain = None
-                self.current_trailing = None
                 self.current_entry_price = None
 
             self.update_capital(date, self.nb_positions * row['Adj Close'])
@@ -143,7 +114,7 @@ class Backtest():
 
         axes[0].set_title(f'{self.symbol} stock price')
         axes[1].set_title('Capital over time')
-        plt.savefig(f'results/{self.symbol}-{self.strategy_id}.png')
+        plt.savefig(f'results/{self.symbol}-{self.strategy.name}.png')
 
 
     def save_results(self):
@@ -152,7 +123,7 @@ class Backtest():
         except ZeroDivisionError:
             winrate = 0
         to_save = {
-            'strategy_id': self.strategy_id,
+            'strategy_id': self.strategy.name,
             'symbol': self.symbol,
             'nb_entries': len(self.entries),
             'nb_exits': len(self.exits),
