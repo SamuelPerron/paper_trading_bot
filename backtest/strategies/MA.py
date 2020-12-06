@@ -2,6 +2,7 @@ from .strategy import Strategy
 
 class MA(Strategy):
     def __init__(self):
+        self.id = 1
         self.name = 'MA'
         self.position_size = 0.15
         self.stop_loss = 0.025

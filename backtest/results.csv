@@ -1,0 +1,2 @@
+datetime,strategy_id,symbol,nb_entries,nb_exits,starting_capital,average_win,average_loss,best_win,worst_loss,average_profit,ending_capital,highest_capital,lowest_capital,average_capital,median_capital,true_change,pct_change,loss,wins,winrate,total_trades
+2020-12-05 22:53:13.563080,1,SHOP.TO,230,230,1000.0,52.9373839011628,-12.288101689655166,144.110001,-30.069976999999938,36.48921796956522,1876.7601430000004,1876.7601430000004,1000.0,1306.0153598528736,1292.839993,876.7601430000004,0.8767601430000004,78,152,0.6608695652173913,230

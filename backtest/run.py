@@ -7,4 +7,4 @@ from strategies.MA import strategy
 
 # Launcher(strategy=3, intraday=True, symbol='AMD')
 
-Backtest('DOL.TO', strategy)
+Backtest('SHOP.TO', strategy)
