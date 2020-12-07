@@ -13,7 +13,7 @@ class Strategy:
             return initial_stop_loss
 
         initial_stop_loss_amount = entry_price - initial_stop_loss
-        if current_price > entry_price + initial_stop_loss_amount:
+        if current_price >= entry_price + initial_stop_loss_amount:
             profit = current_price - entry_price
             trailing_multiplicator = math.floor(profit / initial_stop_loss_amount)
             current_trailing = initial_stop_loss * trailing_multiplicator

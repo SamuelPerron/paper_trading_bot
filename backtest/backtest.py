@@ -24,7 +24,7 @@ class Backtest():
 
 
     def check_entry(self, data):
-        return self.strategy.check_for_entry_signal(data) and\
+        return self.strategy.check_for_entry_signal(data, self.api.df) and\
             (self.current_capital > 0 and self.nb_positions == 0)
 
 
@@ -56,7 +56,7 @@ class Backtest():
                     self.current_entry_price = row['Adj Close']
 
             elif self.check_exit(row):
-                stats['profit'] = row['Adj Close'] * self.nb_positions - self.current_entry_price - self.nb_positions
+                stats['profit'] = row['Adj Close'] * self.nb_positions - self.current_entry_price * self.nb_positions
                 self.stats.exits = self.stats.exits.append(stats, ignore_index=True)
                 self.current_capital += row['Adj Close'] * self.nb_positions
                 if row['Adj Close'] < self.current_entry_price:

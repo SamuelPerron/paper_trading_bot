@@ -11,6 +11,7 @@ class ApiPandas():
         self.df['10d_ma'] = self.get_ma(10)
         self.df['50d_ma'] = self.get_ma(50)
         self.df['200d_ma'] = self.get_ma(200)
+        self.df['31d_std'] = self.get_std(31)
 
 
     def get_df(self, intraday):
@@ -42,6 +43,9 @@ class ApiPandas():
 
     def get_ma(self, period):
         return self.df['Adj Close'].rolling(window=period).mean()
+
+    def get_std(self, period):
+        return self.df['Adj Close'].rolling(window=period).std()
 
     def get_ema(self, period):
         return self.df['Adj Close'].ewm(span=period, adjust=False).mean()
