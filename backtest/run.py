@@ -1,5 +1,5 @@
 from backtest import Launcher, Backtest
-from strategies.MA import strategy
+from strategies.breakout import strategy
 
 # To test a specific stock, create the class with the symbol prop and pass the symbol.
 # To test a specific strategy, create the class with the strategy prop and pass the strategy id.

@@ -40,34 +40,35 @@ class Backtest():
 
     def run(self):
         for date, row in self.api.df.iterrows():
-            if self.nb_positions < 0 or self.current_capital < 0:
-                raise ValueError(f'Problem with state. \nnb_positions: {self.nb_positions}\ncurrent_capital: {self.current_capital}')
+            if date > '2018-01-01':
+                if self.nb_positions < 0 or self.current_capital < 0:
+                    raise ValueError(f'Problem with state. \nnb_positions: {self.nb_positions}\ncurrent_capital: {self.current_capital}')
 
-            stats = {'date': date, 'price': row['Adj Close']}
+                stats = {'date': date, 'price': row['Adj Close']}
 
-            if self.check_entry(row):
-                perc_capital = self.current_capital * self.strategy.position_size
-                qty = int(round(perc_capital / row['Adj Close'], 0))
-                if qty > 0:
-                    self.stats.entries = self.stats.entries.append(stats, ignore_index=True)
-                    price = qty * row['Adj Close']
-                    self.current_capital -= price
-                    self.nb_positions = qty
-                    self.current_entry_price = row['Adj Close']
+                if self.check_entry(row):
+                    perc_capital = self.current_capital * self.strategy.position_size
+                    qty = int(round(perc_capital / row['Adj Close'], 0))
+                    if qty > 0:
+                        self.stats.entries = self.stats.entries.append(stats, ignore_index=True)
+                        price = qty * row['Adj Close']
+                        self.current_capital -= price
+                        self.nb_positions = qty
+                        self.current_entry_price = row['Adj Close']
 
-            elif self.check_exit(row):
-                stats['profit'] = row['Adj Close'] * self.nb_positions - self.current_entry_price * self.nb_positions
-                self.stats.exits = self.stats.exits.append(stats, ignore_index=True)
-                self.current_capital += row['Adj Close'] * self.nb_positions
-                if row['Adj Close'] < self.current_entry_price:
-                    self.stats.nb_loss += 1
-                else:
-                    self.stats.nb_wins += 1
-                self.nb_positions = 0
-                self.current_entry_price = None
+                elif self.check_exit(row):
+                    stats['profit'] = row['Adj Close'] * self.nb_positions - self.current_entry_price * self.nb_positions
+                    self.stats.exits = self.stats.exits.append(stats, ignore_index=True)
+                    self.current_capital += row['Adj Close'] * self.nb_positions
+                    if row['Adj Close'] < self.current_entry_price:
+                        self.stats.nb_loss += 1
+                    else:
+                        self.stats.nb_wins += 1
+                    self.nb_positions = 0
+                    self.current_entry_price = None
 
-            self.update_capital(date, self.nb_positions * row['Adj Close'])
-            print(f'{self.symbol} | {date} | {round(self.current_capital, 2)}')
+                self.update_capital(date, self.nb_positions * row['Adj Close'])
+                print(f'{self.symbol} | {date} | {round(self.current_capital, 2)}')
 
         self.stats.save_run(self.symbol, self.strategy.id, self.api.df)
 
