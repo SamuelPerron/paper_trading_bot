@@ -11,7 +11,7 @@ class MACD(Strategy):
 
 
     def check_for_entry_signal(self, data, *args, **kwargs):
-        return data['MACD'] > data['MACD Signal']
+        return data.iloc[-1]['MACD buy']
 
 
     def find_next_symbols(self):

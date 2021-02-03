@@ -35,7 +35,7 @@ class MarketWatch:
                 cells = stock.find_all('td')
                 results[categories_matches[title]].append({
                     'symbol': cells[0].text.strip(),
-                    'pre_price': float(cells[2].text.strip()[1:]),
+                    'pre_price': MarketWatch.vol_to_float(cells[2].text.strip()[1:]),
                     'pre_volume': MarketWatch.vol_to_float(cells[3].text.strip()),
                     'pre_change': float(cells[4].text.strip()),
                     'pre_change_perc': float(cells[5]

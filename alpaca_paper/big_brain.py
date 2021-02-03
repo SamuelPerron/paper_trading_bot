@@ -11,6 +11,7 @@ class BigBrain:
         self.df['MACD Signal'] = self.get_macd_signal()
         self.df['5d_ma'] = self.get_ma(5)
         self.df['200d_ma'] = self.get_ma(200)
+        self.df['MACD buy'] = self.df['MACD'] > self.df['MACD Signal']
 
 
     def get_ma(self, period):
