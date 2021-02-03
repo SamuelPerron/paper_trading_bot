@@ -66,3 +66,11 @@ def test_positions(alpaca):
 def test_position(alpaca):
     position = alpaca.positions(symbol='TSLA')
     assert isinstance(position, (dict,))
+
+def test_bars(alpaca):
+    symbols = ['GME', 'AMC']
+    bars = alpaca.bars(symbols, 100)
+    assert isinstance(bars, (dict,))
+    assert symbols[0] in bars.keys()
+    assert symbols[1] in bars.keys()
+    assert isinstance(bars[symbols[0]], (list,))

@@ -3,6 +3,7 @@ import requests
 
 class Alpaca:
     base_url = 'https://paper-api.alpaca.markets/v2'
+    market_base_url = 'https://data.alpaca.markets/v1'
 
 
     def api(self, method, url, params={}, data={}):
@@ -10,7 +11,10 @@ class Alpaca:
             'APCA-API-KEY-ID': API_KEY,
             'APCA-API-SECRET-KEY': API_SECRET
         }
-        request = f'requests.{method}("{self.base_url}/{url}", headers={headers}, params={params}, json={data},)'
+        base_url = self.base_url
+        if 'bars' in url:
+            base_url = self.market_base_url
+        request = f'requests.{method}("{base_url}/{url}", headers={headers}, params={params}, json={data},)'
         return eval(request)
 
 
@@ -72,6 +76,14 @@ class Alpaca:
             url += f'/{symbol}'
 
         return self.api(method, url).json()
+
+
+    def bars(self, symbols, limit, timeframe='5Min'):
+        params = {
+            'symbols': ','.join(symbols),
+            'limit': limit,
+        }
+        return self.api('get', f'bars/{timeframe}', params=params).json()
 
 
     def __str__(self):
