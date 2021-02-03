@@ -1,9 +1,11 @@
 from alpaca_paper.dotenv import API_KEY, API_SECRET
+from alpaca_paper.big_brain import BigBrain
 import requests
 
 class Alpaca:
-    base_url = 'https://paper-api.alpaca.markets/v2'
-    market_base_url = 'https://data.alpaca.markets/v1'
+    def __init__(self):
+        self.base_url = 'https://paper-api.alpaca.markets/v2'
+        self.market_base_url = 'https://data.alpaca.markets/v1'
 
 
     def api(self, method, url, params={}, data={}):
@@ -78,12 +80,17 @@ class Alpaca:
         return self.api(method, url).json()
 
 
-    def bars(self, symbols, limit, timeframe='5Min'):
+    def bars(self, symbols, limit=200, timeframe='5Min', big_brain=False):
         params = {
             'symbols': ','.join(symbols),
             'limit': limit,
         }
-        return self.api('get', f'bars/{timeframe}', params=params).json()
+
+        response = self.api('get', f'bars/{timeframe}', params=params)
+        if big_brain and response.status_code == 200:
+            data = response.json()
+            return [BigBrain(symbol=symbol, data=data[symbol]) for symbol in data.keys()]
+        return response.json()
 
 
     def __str__(self):
