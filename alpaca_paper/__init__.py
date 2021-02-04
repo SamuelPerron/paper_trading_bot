@@ -42,12 +42,12 @@ class Alpaca:
             'status', 'limit', 'after', 
             'until', 'direction', 'nested', 'symbols'
         )
-        for ftr in filters:
+        for ftr in filters.keys():
             if ftr not in possible_filters:
-                raise ValueError(f'`{ftr}` is not an acceptable filter.')
+                print(f'ERROR --- `{ftr}` is not an acceptable filter.')
         
         if id and filters != {}:
-            raise ValueError('Can\'t filter when getting a specific order.')
+            print(f'ERROR --- Can\'t filter when getting a specific order.')
 
         url = 'orders'
         if id:
@@ -72,7 +72,7 @@ class Alpaca:
 
         for field in required_fields:
             if not details.get(field):
-                raise ValueError(f'`{field}` is required.')
+                print(f'ERROR --- `{field}` is required.')
 
         return self.api('post', 'orders', data=details).json()
 

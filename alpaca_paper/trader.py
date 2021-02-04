@@ -49,7 +49,11 @@ class Trader:
 
 
     def buy(self, symbol, price):
-        if symbol not in self.alpaca.positions_as_symbols():
+        """
+        API Cost: 3
+        """
+
+        if len(self.alpaca.orders(filters={'status': 'open', 'symbols': symbol})) == 0:
             price = price.iloc[-1]
             stop_loss = self.strategy.find_stop_loss(price)
             buying_power = float(self.alpaca.account()['buying_power'])
@@ -60,13 +64,10 @@ class Trader:
                     'side': 'buy',
                     'type': 'market',
                     'qty': qty,
-                    'order_class': 'bracket',
-                    'take_profit': {
-                        'limit_price': self.strategy.find_take_profit(price)
-                    },
+                    'order_class': 'oto',
                     'stop_loss': {
                         'stop_price': stop_loss,
-                        'limit_price': stop_loss - 0.01
+                        'limit_price': stop_loss - 0.04
                     }
                 }
                 self.alpaca.new_order(order)
