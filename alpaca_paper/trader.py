@@ -23,7 +23,8 @@ class Trader:
         time.sleep(2)
         now = datetime.now()
         if clock['is_open']:
-            print(f'{now.strftime("%Y-%m-%d %H:%M:%S")}')
+            self.health_print(now)
+
             if not os.path.exists(Trader.CSV_FILE):
                 self.find_next_symbols()
             
@@ -60,15 +61,15 @@ class Trader:
                 'qty': qty,
                 'order_class': 'bracket',
                 'take_profit': {
-                    'limit_price': str(self.strategy.find_take_profit(price))
+                    'limit_price': self.strategy.find_take_profit(price)
                 },
                 'stop_loss': {
-                    'stop_price': str(stop_loss),
-                    'limit_price': str(stop_loss - 0.5)
+                    'stop_price': stop_loss,
+                    'limit_price': stop_loss - 0.01
                 }
             }
             self.alpaca.new_order(order)
-            print(f'--- BUY ORDER ---\n    {symbol} x{qty}')
+            print(f'--- BUY ORDER ---\n    {symbol} x{qty} @ $ {round(float(price), 2)}')
 
 
     def find_next_symbols(self):
@@ -99,3 +100,10 @@ class Trader:
         open(Trader.CSV_FILE, 'w')
 
         
+    def health_print(self, now):
+        print(f'\n\n{now.strftime("%Y-%m-%d %H:%M:%S")}')
+        account = self.alpaca.account()
+        last_equity = float(account['last_equity'])
+        equity = float(account['equity'])
+        pl = round((((equity * 100) / last_equity) - 100), 2)
+        print(f'BP: $ {account["buying_power"]} | PV: $ {equity} | P/L: {pl}%')

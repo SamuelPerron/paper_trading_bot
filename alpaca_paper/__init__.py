@@ -52,7 +52,7 @@ class Alpaca:
 
 
     def new_order(self, details):
-        details.update({'time_in_force': 'day'})
+        details.update({'time_in_force': 'gtc'})
         required_fields = ('symbol', 'qty', 'side', 'type')
 
         type = details.get('type')
