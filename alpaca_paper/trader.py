@@ -11,7 +11,7 @@ class Trader:
     def __init__(self, strategy):
         self.alpaca = Alpaca()
         self.strategy = strategy
-        self.timeframe = '5Min'
+        self.timeframe = 'minute'
         self.symbols = []
 
         self.trade()
@@ -35,12 +35,12 @@ class Trader:
                 if self.strategy.check_for_entry_signal(bar.df):
                     self.buy(bar.symbol, bar.df['c'])
 
-        elif (next_open - now).total_seconds() <= 300:
+        elif (next_open - now).total_seconds() <= 120:
             self.find_next_symbols()
             print(f'--- NEW SYMBOLS | {now.strftime("%Y-%m-%d")} ---\n{", ".join(self.symbols)}')
 
         else:
-            next_open_minutes = round((next_open - now).total_seconds() / 60, 2)
+            next_open_minutes = round((next_open - now).total_seconds() / 60, 0)
             if next_open_minutes < 60:
                 print(f'Markets open in {next_open_minutes} minutes.')
             else:
@@ -49,27 +49,28 @@ class Trader:
 
 
     def buy(self, symbol, price):
-        price = price.iloc[-1]
-        stop_loss = self.strategy.find_stop_loss(price)
-        buying_power = float(self.alpaca.account()['buying_power'])
-        qty = self.strategy.find_qty(price, buying_power)
-        if qty > 0:
-            order = {
-                'symbol': symbol,
-                'side': 'buy',
-                'type': 'market',
-                'qty': qty,
-                'order_class': 'bracket',
-                'take_profit': {
-                    'limit_price': self.strategy.find_take_profit(price)
-                },
-                'stop_loss': {
-                    'stop_price': stop_loss,
-                    'limit_price': stop_loss - 0.01
+        if symbol not in self.alpaca.positions_as_symbols():
+            price = price.iloc[-1]
+            stop_loss = self.strategy.find_stop_loss(price)
+            buying_power = float(self.alpaca.account()['buying_power'])
+            qty = self.strategy.find_qty(price, buying_power)
+            if qty > 0:
+                order = {
+                    'symbol': symbol,
+                    'side': 'buy',
+                    'type': 'market',
+                    'qty': qty,
+                    'order_class': 'bracket',
+                    'take_profit': {
+                        'limit_price': self.strategy.find_take_profit(price)
+                    },
+                    'stop_loss': {
+                        'stop_price': stop_loss,
+                        'limit_price': stop_loss - 0.01
+                    }
                 }
-            }
-            self.alpaca.new_order(order)
-            print(f'--- BUY ORDER ---\n    {symbol} x{qty} @ $ {round(float(price), 2)}')
+                self.alpaca.new_order(order)
+                print(f'--- BUY ORDER ---\n    {symbol} x{qty} @ $ {round(float(price), 2)}')
 
 
     def find_next_symbols(self):

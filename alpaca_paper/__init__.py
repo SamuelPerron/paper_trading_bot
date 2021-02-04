@@ -17,7 +17,12 @@ class Alpaca:
         if 'bars' in url:
             base_url = self.market_base_url
         request = f'requests.{method}("{base_url}/{url}", headers={headers}, params={params}, json={data},)'
-        return eval(request)
+        executed_request = eval(request)
+
+        if executed_request.status_code != 200:
+            print(f'ERROR --- {executed_request.json}')
+            # TODO: Log complete error w/ context in file
+        return executed_request
 
 
     def clock(self):
@@ -26,6 +31,10 @@ class Alpaca:
 
     def account(self):
         return self.api('get', 'account').json()
+
+    
+    def positions_as_symbols(self):
+        return [position['symbol'] for position in self.positions()]
 
 
     def orders(self, id=None, filters={}, cancel=False):
