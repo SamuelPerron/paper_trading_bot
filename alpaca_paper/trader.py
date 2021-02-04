@@ -30,10 +30,13 @@ class Trader:
             
             self.fetch_symbols()
 
-            bars = self.alpaca.bars(self.symbols, big_brain=True)
-            for bar in bars:
-                if self.strategy.check_for_entry_signal(bar.df):
-                    self.buy(bar.symbol, bar.df['c'])
+            symbols_bars = self.alpaca.bars(self.symbols, timeframe=self.timeframe, big_brain=True)
+            for symbol_bars in symbols_bars:
+                if self.strategy.check_for_entry_signal(symbol_bars.df):
+                    self.buy(symbol_bars.symbol, symbol_bars.df['c'])
+
+                if self.strategy.check_for_exit_signal(symbol_bars.df):
+                    self.sell(symbol_bars.symbol)
 
         elif (next_open - now).total_seconds() <= 120:
             self.find_next_symbols()
@@ -72,6 +75,11 @@ class Trader:
                 }
                 self.alpaca.new_order(order)
                 print(f'--- BUY ORDER ---\n    {symbol} x{qty} @ $ {round(float(price), 2)}')
+
+
+    def sell(self, symbol):
+        self.alpaca.positions(symbol, True)
+        print(f'--- CLOSING POSITION ---\n    {symbol}')
 
 
     def find_next_symbols(self):

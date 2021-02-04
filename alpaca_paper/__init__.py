@@ -19,7 +19,7 @@ class Alpaca:
         request = f'requests.{method}("{base_url}/{url}", headers={headers}, params={params}, json={data},)'
         executed_request = eval(request)
 
-        if executed_request.status_code != 200:
+        if str(executed_request.status_code)[0] != '2':
             print(f'ERROR --- {executed_request.json}')
             # TODO: Log complete error w/ context in file
         return executed_request
@@ -89,7 +89,7 @@ class Alpaca:
         return self.api(method, url).json()
 
 
-    def bars(self, symbols, limit=200, timeframe='5Min', big_brain=False):
+    def bars(self, symbols, timeframe, limit=200, big_brain=False):
         params = {
             'symbols': ','.join(symbols),
             'limit': limit,
