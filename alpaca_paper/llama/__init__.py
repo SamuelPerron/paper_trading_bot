@@ -25,6 +25,7 @@ migrate = Migrate(app, db)
 ACCOUNT_ID = os.getenv('ACCOUNT_ID')
 ALPACA_UID = os.getenv('ALPACA_UID')
 ALPACA_SECRET = os.getenv('ALPACA_SECRET')
+ACOUNT_BASE_CASH = os.getenv('ACOUNT_BASE_CASH')
 
 
 # --- App imports --- #
@@ -33,3 +34,6 @@ app.register_blueprint(accounts_blueprint, url_prefix='/account')
 
 from .position import positions_blueprint, Position
 app.register_blueprint(positions_blueprint, url_prefix='/positions')
+
+from .order import orders_blueprint, Order
+app.register_blueprint(orders_blueprint, url_prefix='/orders')

@@ -1,10 +1,15 @@
-from .. import ACCOUNT_ID, ALPACA_UID, ALPACA_SECRET
+from .. import ACCOUNT_ID, ALPACA_UID, ALPACA_SECRET, ACOUNT_BASE_CASH
 
 
 def get_current_account():
     from ..account import Account
 
-    return Account.query.filter_by(id=ACCOUNT_ID).first()
+    account = Account.query.filter_by(id=ACCOUNT_ID).first()
+    if not account:
+        account = Account(cash=ACOUNT_BASE_CASH)
+        account.save_to_db()
+
+    return account
 
 
 def alpaca(method, url, params={}, data={}):

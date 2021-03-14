@@ -2,19 +2,14 @@ from .. import db
 from ..base import BaseDBModel
 from ..base.utils import alpaca, bars
 from sqlalchemy_utils.types.choice import ChoiceType
-import enum
 
-
-class PositionSides(enum.Enum):
-    buy = 1
-    sell = 2
 
 class Position(db.Model, BaseDBModel):
     __tablename__ = 'positions'
 
     SIDES = (
-        ('buy', 'Buy'),
-        ('sell', 'Sell'),
+        ('long', 'Long'),
+        ('short', 'Short'),
     )
 
     symbol = db.Column(db.String)
