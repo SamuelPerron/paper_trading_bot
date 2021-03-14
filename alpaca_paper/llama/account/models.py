@@ -8,6 +8,13 @@ association_table_account_historical_equities = db.Table(
             'historical_equities.id'))
 )
 
+association_table_account_positions = db.Table(
+    'association_account_positions', db.Model.metadata,
+        db.Column('account_id', db.Integer, db.ForeignKey('accounts.id')),
+        db.Column('position_id', db.Integer, db.ForeignKey(
+            'positions.id'))
+)
+
 
 class Account(db.Model, BaseDBModel):
     __tablename__ = 'accounts'
@@ -17,6 +24,9 @@ class Account(db.Model, BaseDBModel):
     historical_equities = db.relationship(
         'HistoricalEquity', 
         secondary=association_table_account_historical_equities)
+    positions = db.relationship(
+        'Position', 
+        secondary=association_table_account_positions)
 
     def equity(self):
         """

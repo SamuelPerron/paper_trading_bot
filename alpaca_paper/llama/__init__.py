@@ -50,3 +50,6 @@ class BaseDBModel():
 # --- App imports --- #
 from .account import accounts_blueprint, Account
 app.register_blueprint(accounts_blueprint, url_prefix='/account')
+
+from .position import positions_blueprint, Position
+app.register_blueprint(positions_blueprint, url_prefix='/positions')
