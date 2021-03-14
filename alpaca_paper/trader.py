@@ -78,8 +78,9 @@ class Trader:
 
 
     def sell(self, symbol):
-        self.alpaca.positions(symbol, True)
-        print(f'--- CLOSING POSITION ---\n    {symbol}')
+        if symbol in self.alpaca.positions_as_symbols():
+            self.alpaca.positions(symbol, True)
+            print(f'--- CLOSING POSITION ---\n    {symbol}')
 
 
     def find_next_symbols(self):

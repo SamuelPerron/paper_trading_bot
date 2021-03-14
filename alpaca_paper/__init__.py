@@ -20,7 +20,7 @@ class Alpaca:
         executed_request = eval(request)
 
         if str(executed_request.status_code)[0] != '2':
-            print(f'ERROR --- {executed_request.json}')
+            print(f'ERROR --- {executed_request.json()}')
             # TODO: Log complete error w/ context in file
         return executed_request
 
@@ -80,7 +80,7 @@ class Alpaca:
     def positions(self, symbol=None, close=False):
         method = 'get'
         if close:
-            method = 'DELETE'
+            method = 'delete'
         
         url = 'positions'
         if symbol:
