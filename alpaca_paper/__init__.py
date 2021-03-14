@@ -2,10 +2,159 @@ from alpaca_paper.dotenv import API_KEY, API_SECRET
 from alpaca_paper.big_brain import BigBrain
 import requests
 
-class Alpaca:
+
+class API:
+    def __init__(self):
+        """
+        This should implement a base_url for trading calls
+        and data_url for market data.
+        """
+        raise NotImplementedError()
+
+    def api(self):
+        """
+        This should implement the basic API calls that will
+        be used throughout the implementations of the API.
+
+        Params
+            method => str
+            url    => str
+            params => { param: str(VALUE) }
+            data   => { }
+        """
+        raise NotImplementedError()
+
+    def clock(self):
+        """ 
+        This should primarily return if the markets are opened.
+
+        Expected return format
+            {
+                "is_open": bool,
+                "next_open": datetime(%Y-%m-%dT%H:%M:%S),
+                "next_close": datetime(%Y-%m-%dT%H:%M:%S)
+            }
+        """
+        raise NotImplementedError()
+
+    def account(self):
+        """ 
+        This should return the current account information.
+
+        Expected return format
+            {
+                "id": int or str,
+                "buying_power": float or str,
+                "equity": float or str
+            }
+        """
+        raise NotImplementedError()
+
+    def positions_as_symbols(self):
+        """ 
+        This should return a list of all the symbols currently held.
+
+        Expected return format
+            [
+                str(SYMBOL)
+            ]
+        """
+        raise NotImplementedError()
+
+    def orders(self):
+        """ 
+        This should return the orders linked to the current portfolio.
+        This can return a specific order by passing the order id.
+        This can return filtered orders by passing filters.
+        This can cancel an order by passing cancel to True.
+
+        Params
+            id      => int 
+            filters => { filter_name: str(VALUE) } 
+            cancel  => bool
+
+        Expected return format
+            [
+                Order()
+            ]
+        """
+        raise NotImplementedError()
+
+    def new_order(self):
+        """ 
+        This should be used to send new orders to the distant API.
+
+        Params
+            details => { }
+
+        Expected return format
+            Order()
+        """
+        raise NotImplementedError()
+    
+    def positions(self):
+        """ 
+        This should return all currently held positions.
+        By passing close to True, it is expected to liquidate all positions.
+        By passing close to True and a symbol, it is expected to close
+        this particular position.
+
+        Params
+            symbol => str
+            close  => bool
+
+        Expected return format
+            [
+                Position()
+            ]
+        """
+        raise NotImplementedError()
+
+    def bars(self):
+        """ 
+        This should return market data. Symbols should always be passed
+        to fetch the relevent information. 
+        The timeframe is the period by which the data should be split. 
+        (1Min, 5Min, day, week, ...)
+        The limit is how many periods should be retreived.
+        big_brain should be set to True if we want to have the data computed
+        with metrics like (RSI, MACS, EMA, ...).
+
+        Params
+            symbols   => [ str ]
+            timeframe => str
+            limit     => int
+            big_brain => bool
+
+        Expected return format
+            {
+                str(SYMBOL): [
+                    {
+                        "o": float(OPEN PRICE),
+                        "h": float(HIGH PRICE),
+                        "l": float(LOW PRICE),
+                        "c": float(CLOSE PRICE),
+                        "v": float(VOLUME)
+                    }
+                ]
+            }
+        """
+        raise NotImplementedError()
+
+    def __str__(self):
+        """ 
+        This should return a good identifier for the API.
+
+        Expected return format
+            '{Name} <{account_id}>'
+        """
+        raise NotImplementedError()
+
+
+class Alpaca(API):
     def __init__(self):
         self.base_url = 'https://paper-api.alpaca.markets/v2'
-        self.market_base_url = 'https://data.alpaca.markets/v1'
+        self.data_base_url = 'https://data.alpaca.markets/v1'
 
 
     def api(self, method, url, params={}, data={}):
@@ -15,7 +164,7 @@ class Alpaca:
         }
         base_url = self.base_url
         if 'bars' in url:
-            base_url = self.market_base_url
+            base_url = self.data_base_url
         request = f'requests.{method}("{base_url}/{url}", headers={headers}, params={params}, json={data},)'
         executed_request = eval(request)
 

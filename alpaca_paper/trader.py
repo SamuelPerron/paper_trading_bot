@@ -9,7 +9,7 @@ class Trader:
     CSV_FILE = 'current_symbols.csv'
 
     def __init__(self, strategy):
-        self.alpaca = Alpaca()
+        self.api = Alpaca()
         self.strategy = strategy
         self.timeframe = 'minute'
         self.symbols = []
@@ -18,7 +18,7 @@ class Trader:
 
 
     def trade(self):
-        clock = self.alpaca.clock()
+        clock = self.api.clock()
         next_open = datetime.strptime(clock['next_open'][:-6], '%Y-%m-%dT%H:%M:%S')
         time.sleep(2)
         now = datetime.now()
@@ -30,7 +30,7 @@ class Trader:
             
             self.fetch_symbols()
 
-            symbols_bars = self.alpaca.bars(self.symbols, timeframe=self.timeframe, big_brain=True)
+            symbols_bars = self.api.bars(self.symbols, timeframe=self.timeframe, big_brain=True)
             for symbol_bars in symbols_bars:
                 if self.strategy.check_for_entry_signal(symbol_bars.df):
                     self.buy(symbol_bars.symbol, symbol_bars.df['c'])
@@ -56,10 +56,10 @@ class Trader:
         API Cost: 3
         """
 
-        if len(self.alpaca.orders(filters={'status': 'open', 'symbols': symbol})) == 0:
+        if len(self.api.orders(filters={'status': 'open', 'symbols': symbol})) == 0:
             price = price.iloc[-1]
             stop_loss = self.strategy.find_stop_loss(price)
-            buying_power = float(self.alpaca.account()['buying_power'])
+            buying_power = float(self.api.account()['buying_power'])
             qty = self.strategy.find_qty(price, buying_power)
             if qty > 0:
                 order = {
@@ -73,19 +73,19 @@ class Trader:
                         'limit_price': stop_loss - 0.04
                     }
                 }
-                self.alpaca.new_order(order)
+                self.api.new_order(order)
                 print(f'--- BUY ORDER ---\n    {symbol} x{qty} @ $ {round(float(price), 2)}')
 
 
     def sell(self, symbol):
-        if symbol in self.alpaca.positions_as_symbols():
-            self.alpaca.positions(symbol, True)
+        if symbol in self.api.positions_as_symbols():
+            self.api.positions(symbol, True)
             print(f'--- CLOSING POSITION ---\n    {symbol}')
 
 
     def find_next_symbols(self):
         strategy_symbols = self.strategy.find_next_symbols()
-        positions_symbols = [position['symbol'] for position in self.alpaca.positions()]
+        positions_symbols = [position['symbol'] for position in self.api.positions()]
         symbols = strategy_symbols + positions_symbols
 
         self.create_symbols_file()
@@ -113,7 +113,7 @@ class Trader:
         
     def health_print(self, now):
         print(f'\n\n{now.strftime("%Y-%m-%d %H:%M:%S")}')
-        account = self.alpaca.account()
+        account = self.api.account()
         last_equity = float(account['last_equity'])
         equity = float(account['equity'])
         pl = round((((equity * 100) / last_equity) - 100), 2)
