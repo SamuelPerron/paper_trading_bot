@@ -1,12 +1,13 @@
 from flask import Blueprint, abort
-from .. import app, ACCOUNT_ID
+from .. import app
+from ..base.utils import get_current_account
 from .models import Account
 
 accounts_blueprint = Blueprint('account', __name__)
 
 @accounts_blueprint.route('/')
 def account():
-    account = Account.query.filter_by(id=ACCOUNT_ID).first()
+    account = get_current_account()
 
     if account:
         return account.json()

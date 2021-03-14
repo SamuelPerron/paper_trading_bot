@@ -1,4 +1,5 @@
-from .. import db, BaseDBModel
+from .. import db
+from ..base import BaseDBModel
 from sqlalchemy_utils.types.choice import ChoiceType
 import enum
 

@@ -1,4 +1,5 @@
-from .. import db, BaseDBModel
+from .. import db
+from ..base import BaseDBModel
 
 
 association_table_account_historical_equities = db.Table(
