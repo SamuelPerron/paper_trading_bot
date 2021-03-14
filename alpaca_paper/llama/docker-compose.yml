@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    volumes:
+      - llama-db:/var/lib/postgresql/data
+
+  redis:
+    image: "redis:alpine"
+
+  api:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/api
+    environment:
+      FLASK_ENV: development
+
+volumes:
+  llama-db: {}
+  app: {}

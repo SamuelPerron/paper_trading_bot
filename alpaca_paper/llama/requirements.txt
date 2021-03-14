@@ -1,0 +1,7 @@
+flask
+redis
+Flask-SQLAlchemy
+Flask-Migrate
+sqlalchemy-json
+flask-cors
+psycopg2
