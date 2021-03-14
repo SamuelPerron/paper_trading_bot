@@ -1,0 +1,2 @@
+# Architecture
+![Architecture](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/47886501-7b5f-4e25-9a97-0c4c7a3f26f5/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210314%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210314T155142Z&X-Amz-Expires=86400&X-Amz-Signature=1504d51024d76261a8f7b90f46144cd2c19ae0847953ca92eea3a49f7365c3c4&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
