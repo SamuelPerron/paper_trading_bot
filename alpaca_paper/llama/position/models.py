@@ -1,5 +1,6 @@
 from .. import db
 from ..base import BaseDBModel
+from ..base.utils import alpaca, bars
 from sqlalchemy_utils.types.choice import ChoiceType
 import enum
 
@@ -19,54 +20,66 @@ class Position(db.Model, BaseDBModel):
     symbol = db.Column(db.String)
     qty = db.Column(db.Integer)
     side = db.Column(ChoiceType(SIDES))
+    entry_price = db.Column(db.Float)
+
+    def cost_basis(self):
+        """
+        Total cost basis in dollar
+        """
+        return self.qty * self.entry_price
 
     def market_value(self):
         """
         Total dollar amount of the position
         """
-        pass
+        return self.cost_basis() + (self.qty + self.current_price())
 
     def unrealized_pl(self):
         """
         Unrealized profit/loss in dollars
         """
-        pass
+        return self.market_value() - self.cost_basis()
 
     def unrealized_plpc(self):
         """
-        Unrealized profit/loss percent (by a factor of 1)
+        Unrealized profit/loss percent
         """
-        pass
+        return self.unrealized_pl() / self.cost_basis()
+
+    def change_today(self):
+        """
+        Percent change from last day price
+        """
+        return self.current_price() - self.lastday_price()
 
     def unrealized_intraday_pl(self):
         """
         Unrealized profit/loss in dollars for the day
         """
-        pass
+        return self.change_today() * self.qty
 
     def unrealized_intraday_plpc(self):
         """
-        Unrealized profit/loss percent (by a factor of 1)
+        Unrealized profit/loss percent for the day
         """
-        pass
+        (self.unrealized_intraday_pl() - self.cost_basis()) / self.cost_basis()
 
     def current_price(self):
         """
         Current asset price per share
         """
-        pass
+        response = alpaca('get', f'last_quote/stocks/{self.symbol}')
+        if response.status_code == 200:
+            return response.json()['last']['askprice']
+        return None
 
     def lastday_price(self):
         """
         Last day’s asset price per share based on the closing value of the last trading day
         """
-        pass
+        data = bars((self.symbol,), 'day', limit=1)[self.symbol][0]
+        return self.current_price() - data['c']
 
-    def change_today(self):
-        """
-        Percent change from last day price (by a factor of 1)
-        """
-        pass
 
     def json(self):
         return {
@@ -74,6 +87,7 @@ class Position(db.Model, BaseDBModel):
             'symbol': self.symbol,
             'qty': self.qty,
             'side': self.side,
+            'cost_basis': self.cost_basis(),
             'market_value': self.market_value(),
             'unrealized_pl': self.unrealized_pl(),
             'unrealized_plpc': self.unrealized_plpc(),

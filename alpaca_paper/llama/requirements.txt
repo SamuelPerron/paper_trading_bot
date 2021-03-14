@@ -5,3 +5,6 @@ Flask-Migrate
 sqlalchemy-json
 flask-cors
 psycopg2
+sqlalchemy-utils
+python-dotenv
+requests
