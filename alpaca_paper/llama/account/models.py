@@ -18,6 +18,13 @@ association_table_account_positions = db.Table(
             'positions.id'))
 )
 
+association_table_account_orders = db.Table(
+    'association_account_orders', db.Model.metadata,
+        db.Column('account_id', db.Integer, db.ForeignKey('accounts.id')),
+        db.Column('order_id', db.Integer, db.ForeignKey(
+            'orders.id'))
+)
+
 
 class Account(db.Model, BaseDBModel):
     __tablename__ = 'accounts'
@@ -30,6 +37,9 @@ class Account(db.Model, BaseDBModel):
     positions = db.relationship(
         'Position', 
         secondary=association_table_account_positions)
+    orders = db.relationship(
+        'Order', 
+        secondary=association_table_account_orders)
 
     def equity(self):
         """

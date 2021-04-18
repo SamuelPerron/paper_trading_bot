@@ -13,6 +13,11 @@ class BaseDBModel():
             'id': self.id
         }
 
+    def get_public_fields():
+        return (
+            'id', 'created_at', 'updated_at'
+        )
+
     def delete(self):
         self.soft_deleted = True
         db.session.commit()

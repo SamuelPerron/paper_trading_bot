@@ -27,17 +27,9 @@ class Order(db.Model, BaseDBModel):
     cancelled_at = db.Column(db.DateTime)
 
 
-    def json(self):
-        return {
-            'id': self.id,
-            'symbol': self.symbol,
-            'qty': self.qty,
-            'side': self.side,
-            'order_type': self.order_type,
-            'stop_price': self.stop_price,
-            'status': self.status,
-            'created_at': self.created_at,
-            'filled_at': self.filled_at,
-            'cancelled_at': self.cancelled_at,
-        }
-
+    def get_public_fields():
+        return BaseDBModel.get_public_fields() + (
+            'symbol', 'qty', 'stop_price', 
+            'side', 'order_type', 'status', 
+            'filled_at', 'cancelled_at',
+        )
