@@ -6,15 +6,20 @@ from sqlalchemy_utils.types.choice import ChoiceType
 class Order(db.Model, BaseDBModel):
     __tablename__ = 'orders'
 
+    MARKET = 'market'
+    STOP = 'stop'
     TYPES = (
-        ('market', 'Market'),
-        ('stop', 'Stop'),
+        (MARKET, 'Market'),
+        (STOP, 'Stop'),
     )
 
+    NEW = 'new'
+    FILLED = 'filled'
+    CANCELLED = 'cancelled'
     STATUSES = (
-        ('new', 'New'),
-        ('filled', 'Filled'),
-        ('canceled', 'Canceled'),
+        (NEW, 'New'),
+        (FILLED, 'Filled'),
+        (CANCELLED, 'Cancelled'),
     )
 
     symbol = db.Column(db.String)

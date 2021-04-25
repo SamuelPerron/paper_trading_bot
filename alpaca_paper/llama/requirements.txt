@@ -9,3 +9,5 @@ psycopg2
 sqlalchemy-utils
 python-dotenv
 requests
+pytest
+factory_boy

@@ -1,5 +1,5 @@
 from ...base.tests import BaseTestCase
-from ...account.models import Account
+from .factories import OrderFactory
 
 
 class TestOrderModels(BaseTestCase):

@@ -7,9 +7,11 @@ from sqlalchemy_utils.types.choice import ChoiceType
 class Position(db.Model, BaseDBModel):
     __tablename__ = 'positions'
 
+    LONG = 'long'
+    SHORT = 'short'
     SIDES = (
-        ('long', 'Long'),
-        ('short', 'Short'),
+        (LONG, 'Long'),
+        (SHORT, 'Short'),
     )
 
     symbol = db.Column(db.String)
