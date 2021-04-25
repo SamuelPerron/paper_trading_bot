@@ -3,6 +3,10 @@ import requests
 from datetime import datetime, timedelta
 
 
+def get_choices(choices):
+    return (choice[0] for choice in choices)
+
+
 def get_current_account():
     from ..account import Account
 

@@ -8,6 +8,7 @@ class BaseDBModel():
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
+    # Deprecated, use serializers instead
     def json(self):
         return {
             'id': self.id

@@ -3,6 +3,7 @@ from .. import app
 from .models import Order
 from .serializers import OrderSerializer
 from ..base.responses import ListHttpResponse, ErrorHttpResponse, DetailsHttpResponse
+from ..base.serializers import ValidationError
 
 orders_blueprint = Blueprint('orders', __name__)
 
@@ -13,9 +14,9 @@ def orders():
         response = ListHttpResponse(orders, OrderSerializer, request)
         return response.json()
 
-    serializer = OrderSerializer(request.json, True)
-    if len(serializer.errors) == 0:
+    try:
+        serializer = OrderSerializer(request.json, True)
         return DetailsHttpResponse(serializer.instance, OrderSerializer, request).json()
-    else:
-        return ErrorHttpResponse(serializer.errors).json()
+    except ValidationError as e:
+        return ErrorHttpResponse(e.errors).json()
     

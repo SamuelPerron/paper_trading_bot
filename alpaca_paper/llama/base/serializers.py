@@ -2,6 +2,11 @@ from .. import db
 from .constants import DEFAULT_TIME_FORMAT, VARCHAR_TYPE, DATETIME_TYPE, STRING_TYPE
 
 
+class ValidationError(Exception):
+    def __init__(self, errors):
+        self.errors = errors
+
+
 class ModelSerializer():
     def __init__(self, instance, created=False):
         self.instance = instance
@@ -28,15 +33,20 @@ class ModelSerializer():
             self.fields = self.model.get_public_fields()
 
     def _create_instance(self):
-        object = self.model()
+        final_instance = self.model()
+        self.is_valid(final_instance)
+        
+        if len(self.errors) == 0:
+            final_instance.save_to_db()
+            self.instance = final_instance
+        else:
+            raise ValidationError(self.errors)
+
+    def is_valid(self, final_instance):
         for attr in self.instance.keys():
             value = self.instance[attr]
             self._validate_attr(attr, value)
-            setattr(object, attr, value)
-        
-        if len(self.errors) == 0:
-            object.save_to_db()
-            self.instance = object
+            setattr(final_instance, attr, value)
 
     def to_representation(self):
         return {attr: self._field_to_representation(attr, getattr(self.instance, attr)) for attr in self.fields}
