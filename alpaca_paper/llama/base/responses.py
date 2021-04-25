@@ -3,7 +3,7 @@ from .constants import DEFAULT_TIME_FORMAT
 
 
 class HttpResponse():
-    def __init__(self, data, serializer, request):
+    def __init__(self, data, serializer, request=None):
         self.data = data
         self.request = request
         self.serializer = serializer

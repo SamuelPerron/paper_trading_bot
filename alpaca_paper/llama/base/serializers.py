@@ -7,13 +7,17 @@ class ValidationError(Exception):
         self.errors = errors
 
 
-class ModelSerializer():
+class ModelSerializer:
+    fields = ()
+    custom_fields = ()
+
     def __init__(self, instance, created=False):
         self.instance = instance
         self.created = created
         self.errors = []
 
         self._validate_fields()
+        self._validate_custom_fields()
         self._compute_fields()
 
         if created:
@@ -27,6 +31,11 @@ class ModelSerializer():
             for field in self.fields:
                 if not hasattr(self.model, field):
                     raise ValueError(f"Field `{field}` not in model.")
+
+    def _validate_custom_fields(self):
+        for field in self.custom_fields:
+            if not hasattr(self, f'get_{field}'):
+                raise ValueError(f"Custom field `{field}` has no getter.")
 
     def _compute_fields(self):
         if self.fields == '__all__':
@@ -49,7 +58,17 @@ class ModelSerializer():
             setattr(final_instance, attr, value)
 
     def to_representation(self):
-        return {attr: self._field_to_representation(attr, getattr(self.instance, attr)) for attr in self.fields}
+        representation = {
+            attr: self._field_to_representation(
+                attr, getattr(self.instance, attr)
+            ) for attr in self.fields
+        }
+        representation.update({
+            field: getattr(self, f'get_{field}')()
+            for field in self.custom_fields
+        })
+
+        return representation
 
     def _field_to_representation(self, attr, value):
         if value is None:

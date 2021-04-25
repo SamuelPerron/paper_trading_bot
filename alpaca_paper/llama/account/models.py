@@ -82,14 +82,8 @@ class Account(db.Model, BaseDBModel):
         # TODO: Substract cash locked up in open orders
         return self.cash
 
-    def json(self):
-        return {
-            'id': self.id,
-            'cash': self.cash,
-            'equity': self.equity(),
-            'last_equity': self.last_equity(),
-            'buying_power': self.buying_power(),
-        }
+    def get_public_fields():
+        return BaseDBModel.get_public_fields() + ('id', 'cash')
 
 
 class HistoricalEquity(db.Model, BaseDBModel):
