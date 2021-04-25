@@ -2,6 +2,7 @@ flask
 redis
 Flask-SQLAlchemy
 Flask-Migrate
+Flask-Testing
 sqlalchemy-json
 flask-cors
 psycopg2

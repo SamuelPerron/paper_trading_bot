@@ -1,5 +1,4 @@
 from flask import Blueprint, abort
-from .. import app
 
 positions_blueprint = Blueprint('positions', __name__)
 

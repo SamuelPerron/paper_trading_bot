@@ -1,5 +1,4 @@
 from flask import Blueprint, abort
-from .. import app
 from ..base.utils import get_current_account
 from ..base.responses import DetailsHttpResponse
 from .models import Account

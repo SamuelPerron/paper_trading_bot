@@ -1,5 +1,4 @@
 from flask import Blueprint, abort, request
-from .. import app
 from .models import Order
 from .serializers import OrderSerializer
 from ..base.responses import ListHttpResponse, ErrorHttpResponse, DetailsHttpResponse

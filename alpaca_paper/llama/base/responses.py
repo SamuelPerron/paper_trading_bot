@@ -2,7 +2,7 @@ from datetime import datetime
 from .constants import DEFAULT_TIME_FORMAT
 
 
-class HttpResponse():
+class HttpResponse:
     def __init__(self, data, serializer, request=None):
         self.data = data
         self.request = request
@@ -27,17 +27,17 @@ class ListHttpResponse(HttpResponse):
         json = super().json()
 
         json['data'] = [self.serializer(obj).to_representation() for obj in self.data]
-        json['total'] = len(self.data)
+        json['count'] = len(self.data)
 
         return json
 
 
-class ErrorHttpResponse():
+class ErrorHttpResponse:
     def __init__(self, errors):
         self.errors = errors
 
     def json(self):
         return {
             'errors': self.errors,
-            'total': len(self.errors)
+            'count': len(self.errors)
         }
