@@ -19,3 +19,14 @@ https://pythonhosted.org/Flask-Testing/
 **Running tests**
 
 `docker exec -it llama_api_1 pytest`
+
+## Migrations
+https://flask-migrate.readthedocs.io/en/latest/index.html
+
+**Creating migrations**
+
+`docker exec -it llama_api_1 flask db migrate`
+
+**Running migrations**
+
+`docker exec -it llama_api_1 flask db upgrade`

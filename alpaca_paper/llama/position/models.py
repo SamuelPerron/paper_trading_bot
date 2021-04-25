@@ -18,6 +18,7 @@ class Position(db.Model, BaseDBModel):
     qty = db.Column(db.Integer)
     side = db.Column(ChoiceType(SIDES))
     entry_price = db.Column(db.Float)
+    closed = db.Column(db.Boolean, default=False)
 
     def cost_basis(self):
         """
