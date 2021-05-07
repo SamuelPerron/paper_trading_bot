@@ -4,6 +4,7 @@ from ...base.tests import BaseTestCase
 from ...account.tests.factories import AccountFactory
 from ...position import Position
 from .factories import OrderFactory
+from .models import Order
 
 
 class TestOrderModels(BaseTestCase):
@@ -18,23 +19,18 @@ class TestOrderModels(BaseTestCase):
     def test_create_order(self):
         # Creating an order should add it to the account orders
         # and freeze the funds necessary for the execution
-        account = AccountFactory()
-        original_cash = account.cash
-
         order = OrderFactory()
         order.save_to_db()
-        account.orders.append(order)
+        account = order.account
+        original_cash = account.cash
 
         assert order in account.orders
         assert account.cash == original_cash - order.needed_funds
 
     def test_create_short_order_without_holding_symbol(self):
         # This should cancel the order for now
-        account = AccountFactory()
-
         order = OrderFactory(side=Position.SHORT)
         order.save_to_db()
-        account.orders.append(order)
 
         assert order.fill() == False
         assert order.status == Order.CANCELLED
@@ -42,12 +38,10 @@ class TestOrderModels(BaseTestCase):
     def test_fill_long_order(self):
         # This should remove the funds from the cash balance of the account
         # and create the right position 
-        account = AccountFactory()
-        original_cash = account.cash
-
         order = OrderFactory(side=Position.LONG)
         order.save_to_db()
-        account.orders.append(order)
+        account = order.account
+        original_cash = account.cash
 
         assert order.fill() == True
         assert order.status == Order.FILLED
@@ -57,14 +51,14 @@ class TestOrderModels(BaseTestCase):
     def test_fill_short_order(self):
         # This should add the gain of the sale to the 
         # cash balance of the account and close the right position
-        account = AccountFactory()
         long = OrderFactory(side=Position.LONG)
         long.save_to_db()
-        account.orders.append(long)
         long.fill()
+        account = long.account
         original_cash = account.cash
 
         short = OrderFactory(
+            account=account,
             side=Position.SHORT, 
             symbol=long.symbol, 
             qty=long.qty
@@ -79,12 +73,10 @@ class TestOrderModels(BaseTestCase):
     def test_cancel_order(self):
         # This should cancel the order, any subsequent attempts to
         # fill the order should fail. Frozen funds should be recredited.
-        account = AccountFactory()
-        original_cash = account.cash
-
         order = OrderFactory()
         order.save_to_db()
-        account.orders.append(order)
+        account = order.account
+        original_cash = account.cash
 
         order.cancel()
 

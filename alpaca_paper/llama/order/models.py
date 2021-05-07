@@ -3,6 +3,8 @@ from ..base import BaseDBModel
 from ..base.utils import bars
 from ..position import Position
 from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy.orm import relationship
+
 
 class Order(db.Model, BaseDBModel):
     __tablename__ = 'orders'
@@ -23,6 +25,7 @@ class Order(db.Model, BaseDBModel):
         (CANCELLED, 'Cancelled'),
     )
 
+    account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'), nullable=False)
     symbol = db.Column(db.String)
     qty = db.Column(db.Integer)
     needed_funds = db.Column(db.Float)
@@ -33,6 +36,8 @@ class Order(db.Model, BaseDBModel):
     status = db.Column(ChoiceType(STATUSES))
     filled_at = db.Column(db.DateTime)
     cancelled_at = db.Column(db.DateTime)
+
+    account = relationship('Account', foreign_keys='Order.account_id', backref='orders')
 
     def get_public_fields():
         return BaseDBModel.get_public_fields() + (

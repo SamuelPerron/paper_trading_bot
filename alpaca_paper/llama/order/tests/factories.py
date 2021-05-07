@@ -5,6 +5,7 @@ from datetime import datetime
 from ... import db
 from .. import Order
 from ...position import Position
+from ...account.tests.factories import AccountFactory
 
 STOCK_SYMBOLS = (
     'TSLA', 'AAPL', 'GME',
@@ -20,6 +21,7 @@ class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
         sqlalchemy_session_persistence = None
 
+    account = factory.SubFactory(AccountFactory)
     symbol = fuzzy.FuzzyChoice(STOCK_SYMBOLS)
     qty = fake.random_digit_not_null()
     order_type = Order.MARKET # TODO: order_type = factory.fuzzy.FuzzyChoice(Order.TYPES)
