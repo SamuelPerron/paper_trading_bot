@@ -7,7 +7,7 @@ from .. import Order
 from ...position import Position
 
 STOCK_SYMBOLS = (
-    'TSLA', 'APPL', 'GME',
+    'TSLA', 'AAPL', 'GME',
     'NKE', 'GS', 'AMZN',
     'BABA', 'NVDA', 'GM',
 )
@@ -18,7 +18,7 @@ class OrderFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = Order
         sqlalchemy_session = db.session
-        sqlalchemy_session_persistence = 'commit'
+        sqlalchemy_session_persistence = None
 
     symbol = fuzzy.FuzzyChoice(STOCK_SYMBOLS)
     qty = fake.random_digit_not_null()

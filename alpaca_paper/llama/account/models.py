@@ -32,13 +32,16 @@ class Account(db.Model, BaseDBModel):
     cash = db.Column(db.Float, default=0)
 
     historical_equities = db.relationship(
-        'HistoricalEquity', 
+        'HistoricalEquity',
+        backref='account',
         secondary=association_table_account_historical_equities)
     positions = db.relationship(
         'Position', 
+        backref='account',
         secondary=association_table_account_positions)
     orders = db.relationship(
         'Order', 
+        backref='account',
         secondary=association_table_account_orders)
 
     def equity(self):
@@ -83,7 +86,7 @@ class Account(db.Model, BaseDBModel):
         return self.cash
 
     def get_public_fields():
-        return BaseDBModel.get_public_fields() + ('id', 'cash')
+        return BaseDBModel.get_public_fields() + ('cash',)
 
 
 class HistoricalEquity(db.Model, BaseDBModel):

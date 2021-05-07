@@ -20,7 +20,7 @@ def get_current_account():
 
 def alpaca(method, url, params={}, data={}):
     base_url = 'https://paper-api.alpaca.markets/v2'
-    if 'bars' in url:
+    if 'bars' in url or 'last_quote' in url:
         base_url = 'https://data.alpaca.markets/v1'
     
     headers = {
@@ -32,7 +32,7 @@ def alpaca(method, url, params={}, data={}):
     executed_request = eval(request)
 
     if str(executed_request.status_code)[0] != '2':
-        print(f'ERROR --- {executed_request.json()}')
+        print(f'ERROR --- [{executed_request.status_code}] - {executed_request.json()} - {executed_request.url}')
         # TODO: Log complete error w/ context in file
     return executed_request
 
