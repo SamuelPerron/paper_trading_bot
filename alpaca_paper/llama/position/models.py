@@ -2,6 +2,7 @@ from .. import db
 from ..base import BaseDBModel
 from ..base.utils import alpaca, bars
 from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy.orm import relationship
 
 
 class Position(db.Model, BaseDBModel):
@@ -14,11 +15,22 @@ class Position(db.Model, BaseDBModel):
         (SHORT, 'Short'),
     )
 
+    account_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('accounts.id'), 
+        nullable=False
+    )
     symbol = db.Column(db.String)
     qty = db.Column(db.Integer)
     side = db.Column(ChoiceType(SIDES))
     entry_price = db.Column(db.Float)
     closed = db.Column(db.Boolean, default=False)
+
+    account = relationship(
+        'Account', 
+        foreign_keys='Position.account_id', 
+        backref='positions'
+    )
 
     def cost_basis(self):
         """

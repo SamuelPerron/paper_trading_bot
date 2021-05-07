@@ -13,4 +13,12 @@ class AccountFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     cash = factory.Faker('pyfloat', positive=True)
 
+    class Params:
+        rich = factory.Trait(
+            cash=9999999999999999999999
+        )
+        poor = factory.Trait(
+            cash=9
+        )
+
     

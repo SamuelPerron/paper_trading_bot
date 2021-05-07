@@ -11,13 +11,6 @@ association_table_account_historical_equities = db.Table(
             'historical_equities.id'))
 )
 
-association_table_account_positions = db.Table(
-    'association_account_positions', db.Model.metadata,
-        db.Column('account_id', db.Integer, db.ForeignKey('accounts.id')),
-        db.Column('position_id', db.Integer, db.ForeignKey(
-            'positions.id'))
-)
-
 
 class Account(db.Model, BaseDBModel):
     __tablename__ = 'accounts'
@@ -28,10 +21,6 @@ class Account(db.Model, BaseDBModel):
         'HistoricalEquity',
         backref='account',
         secondary=association_table_account_historical_equities)
-    positions = db.relationship(
-        'Position', 
-        backref='account',
-        secondary=association_table_account_positions)
 
     def equity(self):
         """
@@ -69,9 +58,6 @@ class Account(db.Model, BaseDBModel):
         """
         Current available $ buying power
         """
-        # Since orders are filled instantly for now, buying power
-        # will always equal cash on hand. 
-        # TODO: Substract cash locked up in open orders
         return self.cash
 
     def get_public_fields():
