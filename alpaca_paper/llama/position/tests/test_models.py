@@ -1,33 +1,52 @@
-# from ...base.tests import BaseTestCase
-# from ...position import Position
-# from .factories import AccountFactory
-# from ..models import Account
+from ...base.tests import BaseTestCase
+from ..models import Position
 
 
-# class TestAccountModels(BaseTestCase):
-#     def test_equity(self):
-#         """
-#         Checks that equity returns total cash + total positions value
-#         It should also create an historical equity
-#         """
-#         raise NotImplementedError()
+class TestPositionModels(BaseTestCase):
+    def test_cost_basis(self):
+        """
+        Checks that cost_basis returns correct value
+        """
+        raise NotImplementedError()
 
-#     def test_buying_power(self):
-#         """
-#         Checks that buying_power returns total cash - frozen funds in 
-#         open orders
-#         """
-#         raise NotImplementedError()
+    def test_market_value(self):
+        """
+        Checks that market_value returns correct value
+        """
+        raise NotImplementedError()
 
-#     def test_last_equity(self):
-#         """
-#         Checks that last_equity returns historical equity of last close
-#         """
-#         raise NotImplementedError()
+    def test_unrealized_pl(self):
+        """
+        Checks that unrealized_pl returns correct value
+        """
+        raise NotImplementedError()
 
-#     def test_get_equity_of_date(self):
-#         """
-#         Checks that get_equity_of_date returns 
-#         hisorical equity of specific date
-#         """
-#         raise NotImplementedError()
+    def test_change_today(self):
+        """
+        Checks that change_today returns correct value
+        """
+        raise NotImplementedError()
+
+    def test_unrealized_intraday_pl(self):
+        """
+        Checks that unrealized_intraday_pl returns correct value
+        """
+        raise NotImplementedError()
+
+    def test_unrealized_intraday_plpc(self):
+        """
+        Checks that unrealized_intraday_plpc returns correct value
+        """
+        raise NotImplementedError()
+
+    def test_current_price(self):
+        """
+        Checks that current_price returns a number
+        """
+        raise NotImplementedError()
+
+    def test_last_day_price(self):
+        """
+        Checks that last_day_price returns a number
+        """
+        raise NotImplementedError()
