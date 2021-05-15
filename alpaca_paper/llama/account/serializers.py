@@ -8,10 +8,10 @@ class AccountSerializer(ModelSerializer):
     custom_fields = ('equity', 'last_equity', 'buying_power')
 
     def get_equity(self):
-        return getattr(self.instance, 'equity')()
+        return self.instance.equity()
 
     def get_last_equity(self):
-        return getattr(self.instance, 'last_equity')()
+        return self.instance.last_equity()
 
     def get_buying_power(self):
-        return getattr(self.instance, 'buying_power')()
+        return self.instance.buying_power()

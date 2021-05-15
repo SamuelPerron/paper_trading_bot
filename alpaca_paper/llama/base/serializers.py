@@ -8,6 +8,7 @@ class ValidationError(Exception):
 
 
 class ModelSerializer:
+    model = None
     fields = ()
     custom_fields = ()
 
@@ -49,13 +50,17 @@ class ModelSerializer:
             final_instance.save_to_db()
             self.instance = final_instance
         else:
-            raise ValidationError(self.errors)
+            return self.errors
 
     def is_valid(self, final_instance):
         for attr in self.instance.keys():
             value = self.instance[attr]
             self._validate_attr(attr, value)
-            setattr(final_instance, attr, value)
+
+            if hasattr(self, f'set_{attr}'):
+                getattr(self, f'set_{attr}')(final_instance, value)
+            else:
+                setattr(final_instance, attr, value)
 
     def to_representation(self):
         representation = {
@@ -85,6 +90,10 @@ class ModelSerializer:
         return value
 
     def _validate_attr(self, attr, value):
+        if hasattr(self, f'valid_{attr}'):
+            getattr(self, f'valid_{attr}')(value)
+            return
+        
         try:
             attr_type = getattr(self.model, attr).property.columns[0].type
         except AttributeError:

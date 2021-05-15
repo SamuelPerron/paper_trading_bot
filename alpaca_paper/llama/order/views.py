@@ -14,6 +14,8 @@ def orders():
         return response.json()
 
     try:
+        # TODO: Inject account into data
+        # TODO: Handle new error logic
         serializer = OrderSerializer(request.json, True)
         return DetailsHttpResponse(serializer.instance, OrderSerializer, request).json()
     except ValidationError as e:
