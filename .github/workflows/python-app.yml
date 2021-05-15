@@ -5,7 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ master ]
+    branches: [ ** ]
   pull_request:
     branches: [ master ]
 
@@ -16,19 +16,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 3.7 for llama
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.7
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install coala pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with coala
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        coala
-    - name: Test with pytest
+        pip install -r alpaca_paper/llama/requirements.txt
+    - name: Run tests
       run: |
         pytest
