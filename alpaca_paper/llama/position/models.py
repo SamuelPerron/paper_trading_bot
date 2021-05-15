@@ -42,7 +42,7 @@ class Position(db.Model, BaseDBModel):
         """
         Total dollar amount of the position
         """
-        return self.cost_basis() + (self.qty + self.current_price())
+        return self.qty * self.current_price()
 
     def unrealized_pl(self):
         """
@@ -72,16 +72,18 @@ class Position(db.Model, BaseDBModel):
         """
         Unrealized profit/loss percent for the day
         """
-        (self.unrealized_intraday_pl() - self.cost_basis()) / self.cost_basis()
+        cost_basis = self.cost_basis()
+        return (self.unrealized_intraday_pl() - cost_basis) / cost_basis
 
     def current_price(self):
         """
         Current asset price per share
         """
-        response = alpaca('get', f'last_quote/stocks/{self.symbol}')
-        if response.status_code == 200:
-            return response.json()['last']['askprice']
-        return None
+        return bars(
+            [self.symbol], 
+            'minute', 
+            1
+        )[self.symbol][0]['c']
 
     def lastday_price(self):
         """
