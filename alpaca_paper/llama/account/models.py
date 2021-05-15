@@ -42,15 +42,20 @@ class Account(db.Model, BaseDBModel):
         """
         Equity as of previous trading day at 16:00:00 ET
         """
-        grace_period = 5
+        return self.get_equity_of_date(
+            datetime.strptime(clock()['last_close'], '%Y-%m-%dT%H:%M')
+        )
 
-        last_close = datetime.strptime(clock()['last_close'], '%Y-%m-%dT%H:%M')
-        start_grace = last_close - timedelta(minutes=grace_period)
-        finish_grace = last_close + timedelta(minutes=grace_period)
+    def get_equity_of_date(self, date=None):
+        if date is not None:
+            grace_period = 5
 
-        for h in self.historical_equities:
-            if h.timestamp >= start_grace and h.timestamp <= finish_grace:
-                return h.equity
+            start_grace = date - timedelta(minutes=grace_period)
+            finish_grace = date + timedelta(minutes=grace_period)
+
+            for h in self.historical_equities:
+                if h.timestamp >= start_grace and h.timestamp <= finish_grace:
+                    return h.equity
         
         return None
 
