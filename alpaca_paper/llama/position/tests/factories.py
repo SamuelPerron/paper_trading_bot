@@ -20,11 +20,6 @@ class PositionFactory(factory.alchemy.SQLAlchemyModelFactory):
     side = fuzzy.FuzzyChoice(
         Position.SIDES, getter=lambda c: c[0]
     )
-    entry_price = fake.pyfloat(positive=True, min_value=0.01, max_value=1200)
-
-    class Params:
-        closed = factory.Trait(
-            closed=True
-        )
+    entry_price = fake.pyfloat(positive=True, max_value=1200)
 
     

@@ -9,12 +9,16 @@ class TestOrderModels(BaseTestCase):
     def test_needed_funds_filled(self):
         """
         Checks that, when we save an order, the needed_funds field
-        is filled
+        is filled and that the amount is substracted from the account's cash
         """
-        order = OrderFactory(side=Position.LONG)
+        account = AccountFactory()
+        base_account_cash = account.cash
+        order = OrderFactory(side=Position.LONG, account=account)
         order.save_to_db()
+        new_account_cash = account.cash
 
         assert order.needed_funds is not None
+        assert new_account_cash == base_account_cash - order.needed_funds
 
     def test_create_long_order(self):
         """
