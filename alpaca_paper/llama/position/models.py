@@ -92,21 +92,8 @@ class Position(db.Model, BaseDBModel):
         data = bars((self.symbol,), 'day', limit=1)[self.symbol][0]
         return self.current_price() - data['c']
 
-
-    def json(self):
-        return {
-            'id': self.id,
-            'symbol': self.symbol,
-            'qty': self.qty,
-            'side': self.side,
-            'cost_basis': self.cost_basis(),
-            'market_value': self.market_value(),
-            'unrealized_pl': self.unrealized_pl(),
-            'unrealized_plpc': self.unrealized_plpc(),
-            'unrealized_intraday_pl': self.unrealized_intraday_pl(),
-            'unrealized_intraday_plpc': self.unrealized_intraday_plpc(),
-            'current_price': self.current_price(),
-            'lastday_price': self.lastday_price(),
-            'change_today': self.change_today(),
-        }
+    def get_public_fields():
+        return BaseDBModel.get_public_fields() + (
+            'symbol', 'qty', 'side',
+        )
 

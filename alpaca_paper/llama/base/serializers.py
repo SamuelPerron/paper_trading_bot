@@ -35,7 +35,7 @@ class ModelSerializer:
 
     def _validate_custom_fields(self):
         for field in self.custom_fields:
-            if not hasattr(self, f'get_{field}'):
+            if not hasattr(self, f'get_{field}') and not hasattr(self.model, field):
                 raise ValueError(f"Custom field `{field}` has no getter.")
 
     def _compute_fields(self):
@@ -68,12 +68,19 @@ class ModelSerializer:
                 attr, getattr(self.instance, attr)
             ) for attr in self.fields
         }
+
         representation.update({
-            field: getattr(self, f'get_{field}')()
+            field: self._get_custom_getter(field)()
             for field in self.custom_fields
         })
 
         return representation
+
+    def _get_custom_getter(self, field):
+        if hasattr(self, f'get_{field}'):
+            return getattr(self, f'get_{field}')
+        else:
+            return getattr(self.instance, field)
 
     def _field_to_representation(self, attr, value):
         if value is None:
