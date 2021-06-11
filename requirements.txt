@@ -115,7 +115,7 @@ urllib3==1.25.10
 vim-vint==0.3.21
 vulture==0.25
 websocket-client==0.57.0
-websockets==8.1
+websockets==9.1
 Werkzeug==1.0.1
 wrapt==1.12.1
 yamllint==1.6.1
