@@ -7,7 +7,7 @@ from stats.statistics import RunData
 INITIAL_CAPITAL = 1000
 
 class Backtest():
-    def __init__(self, symbol, strategy, intraday=False):
+    def __init__(self, symbol, strategy, intraday=False, allow_fractional=False):
         self.symbol = symbol
         self.api = ApiPandas(self.symbol, intraday)
         self.strategy = strategy
@@ -19,6 +19,7 @@ class Backtest():
         self.current_take_gain = None
         self.current_trailing = None
         self.current_entry_price = None
+        self.allow_fractional = allow_fractional
 
         self.run()
 
@@ -48,13 +49,17 @@ class Backtest():
 
                 if self.check_entry(row):
                     perc_capital = self.current_capital * self.strategy.position_size
-                    qty = int(round(perc_capital / row['Adj Close'], 0))
+                    if self.allow_fractional:
+                        qty = perc_capital / row['Adj Close']
+                    else:
+                        qty = int(round(perc_capital / row['Adj Close'], 0))
+
                     if qty > 0:
-                        self.stats.entries = self.stats.entries.append(stats, ignore_index=True)
-                        price = qty * row['Adj Close']
-                        self.current_capital -= price
-                        self.nb_positions = qty
-                        self.current_entry_price = row['Adj Close']
+                            self.stats.entries = self.stats.entries.append(stats, ignore_index=True)
+                            price = qty * row['Adj Close']
+                            self.current_capital -= price
+                            self.nb_positions = qty
+                            self.current_entry_price = row['Adj Close']
 
                 elif self.check_exit(row):
                     stats['profit'] = row['Adj Close'] * self.nb_positions - self.current_entry_price * self.nb_positions
@@ -75,10 +80,12 @@ class Backtest():
 
 
 class Launcher:
-    def __init__(self, strategy=None, symbol=None, intraday=False):
+    def __init__(self, strategy=None, symbol=None, intraday=False, allow_fractional=False):
         self.intraday = intraday
+        self.allow_fractional = allow_fractional
+
         if strategy and symbol:
-            Backtest(symbol, strategy, self.intraday)
+            Backtest(symbol, strategy, self.intraday, self.allow_fractional)
         else:
 
             if strategy:
