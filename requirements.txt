@@ -111,7 +111,7 @@ toml==0.10.1
 tqdm==4.48.2
 traitlets==4.3.3
 unidiff==0.5.5
-urllib3==1.25.10
+urllib3==1.26.5
 vim-vint==0.3.21
 vulture==0.25
 websocket-client==0.57.0
